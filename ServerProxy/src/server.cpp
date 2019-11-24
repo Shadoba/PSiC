@@ -2,6 +2,7 @@
 
 #include <zmq.h>
 #include <Config.hpp>
+#include <serverException.hpp>
 
 #include <sys/socket.h>
 #include <netinet/in.h>

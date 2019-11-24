@@ -53,7 +53,7 @@ void serverException::assert(bool condition, const char * const msg, const char 
 {
     if(condition)
     {
-        throw PSiC::serverException(msg, func, err, line, file);
+        throw serverException(msg, func, err, line, file);
     }
 }
 
