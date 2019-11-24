@@ -12,52 +12,6 @@
 
 //https://linux.die.net/man/3/getaddrinfo FOR NAME RESOLUTION
 
-class ProxyConnection
-{
-public:
-    ProxyConnection(void *clientSocket,std::vector<unsigned char> clientId, void *serverSocket, std::vector<unsigned char> serverId, bool secure)
-    {
-        this->clientSocket = clientSocket;
-        this->clientId = clientId;
-        this->serverSocket = serverSocket;
-        this->serverId = serverId;
-        this->secure = secure;
-    }
-
-    void *getClientSocket()
-    {
-        return clientSocket;
-    }
-
-    std::vector<unsigned char> getClientId()
-    {
-        return clientId;
-    }
-
-    void *getServerSocket()
-    {
-        return serverSocket;
-    }
-
-    std::vector<unsigned char> getServerId()
-    {
-        return serverId;
-    }
-
-    bool getSecure()
-    {
-        return secure;
-    }
-
-
-protected:
-    void *clientSocket;
-    std::vector<unsigned char> clientId;
-    void *serverSocket;
-    std::vector<unsigned char> serverId;
-    bool secure;
-    float inactivityTimer;
-};
 
 #define BUFFER_SIZE 8192
 #define ID_LENGTH 5
