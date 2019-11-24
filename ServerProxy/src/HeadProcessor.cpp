@@ -52,6 +52,7 @@ void HeadProcessor::pullDataFromHead(std::string head)
     }
 }
 
+//Na razie tylko przepisuje i podmienia URL, jeśli trzeba
 void HeadProcessor::transformHead(std::string head)
 {
     m_outputHead += m_method;
