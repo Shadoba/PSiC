@@ -15,6 +15,9 @@ public:
     std::string getOutputHead();
 
 private:
+    void pullDataFromHead(std::string head);
+    void transformHead(std::string head);
+
     std::string m_head;
     std::string m_method;
     std::string m_url;
