@@ -2,8 +2,8 @@ CXX = g++
 LD = g++ 
 DEP_FLAGS = -MMD
 CXX_FLAGS = -g -Wall
-LFLAGS = -Wall -lm $(HOME)/ZAJECIA/PSiC/LAB07/zeroInstall/lib/libzmq.a -pthread
-INC_FLAG = -Iinc -I$(HOME)/ZAJECIA/PSiC/LAB07/zeroInstall/include
+LFLAGS = -Wall -lm $(HOME)/ZAJECIA/PSiC/PSiC/zeroInstall/lib/libzmq.a -pthread
+INC_FLAG = -Iinc -I$(HOME)/ZAJECIA/PSiC/PSiC/zeroInstall/include
 
 ifndef $(LOG_LEVEL)
 LOG_LEVEL = 0
@@ -12,7 +12,7 @@ CXXFLAGS += $(DEP_FLAGS) $(INC_FLAG) -DLOG_LEVEL=$(LOG_LEVEL)
 LFLAGS += $(DEP_FLAGS) $(INC_FLAG)
 
 #App name
-TARGET=TCPServerNonBlockZMQ
+TARGET=ServerProxy
 
 BINDIR = ./bin
 BUILDDIR = ./build
