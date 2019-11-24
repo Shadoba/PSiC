@@ -1,6 +1,8 @@
 #include <iostream>
 
 #include <zmq.h>
+#include <Config.hpp>
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -16,7 +18,23 @@
 #define BUFFER_SIZE 8192
 #define ID_LENGTH 5
 
+void run();
+
 int main()
+{
+    Config::getInstance().init(std::cout);
+    try
+    {
+        run();
+    }
+    catch(serverException & exception)
+    {
+        std::cout<<exception.what()<<std::endl;
+    }
+    return 0;
+}
+
+void run()
 {
     void *context = zmq_ctx_new();
     void *serverSocket = zmq_socket(context, ZMQ_STREAM);
@@ -62,8 +80,8 @@ int main()
         }
         else
         {
-            dataString = std::string(data, dataSize);
-            dataString.append('\0');
+            dataString = std::string(reinterpret_cast<char *>(data), dataSize);
+            dataString.append("");
 
             //TODO: Parse request, connect to server, create a ProxyConnection object and store it.
         }
@@ -75,6 +93,4 @@ int main()
 
     zmq_close(serverSocket);
     zmq_ctx_destroy(context);
-
-    return 0;
 }
