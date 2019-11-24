@@ -10,9 +10,10 @@ namespace PSiC
      * @param err errpr number of errno macro
      * @param line line where error occured
      */
-	serverException::serverException(const char * const msg, const char * const func, int err, int line) : std::exception(), m_FunctionName(func), m_Errno(err), m_line(line)
+	serverException::serverException(const char * const msg, const char * const func, int err, int line, const char * const file) : std::exception(), m_FunctionName(func), m_Errno(err), m_line(line), m_file(file)
     {
-        m_Message = "line: ";
+        m_Message = m_file;
+        m_Message += ", line: ";
         m_Message += std::to_string(m_line);
         m_Message += ", function: ";
         m_Message += m_FunctionName;
@@ -50,11 +51,11 @@ namespace PSiC
      * @param err error number of errno macro
      * @param line line where error occured
      */
-    void serverException::assert(bool condition, const char * const msg, const char * const func, int err, int line)
+    void serverException::assert(bool condition, const char * const msg, const char * const func, int err, int line, const char * const file)
     {
         if(condition)
         {
-            throw PSiC::serverException(msg, func, err, line);
+            throw PSiC::serverException(msg, func, err, line, file);
         }
     }
 
