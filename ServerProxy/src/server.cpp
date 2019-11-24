@@ -8,17 +8,19 @@
 #include <cstring>
 #include <cassert>
 #include <sstream>
+#include <vector>
 
 //https://linux.die.net/man/3/getaddrinfo FOR NAME RESOLUTION
-//ZMQ_STREAM socket mode - works differently to normal!
 
 class ProxyConnection
 {
 public:
-    ProxyConnection(void *clientSocket, std::string clientId, void *serverSocket, std::string serverId, bool secure)
+    ProxyConnection(void *clientSocket,std::vector<unsigned char> clientId, void *serverSocket, std::vector<unsigned char> serverId, bool secure)
     {
         this->clientSocket = clientSocket;
+        this->clientId = clientId;
         this->serverSocket = serverSocket;
+        this->serverId = serverId;
         this->secure = secure;
     }
 
@@ -27,7 +29,7 @@ public:
         return clientSocket;
     }
 
-    std::string getClientId()
+    std::vector<unsigned char> getClientId()
     {
         return clientId;
     }
@@ -37,7 +39,7 @@ public:
         return serverSocket;
     }
 
-    std::string getServerId()
+    std::vector<unsigned char> getServerId()
     {
         return serverId;
     }
@@ -50,10 +52,11 @@ public:
 
 protected:
     void *clientSocket;
-    std::string clientId;
+    std::vector<unsigned char> clientId;
     void *serverSocket;
-    std::string serverId;
+    std::vector<unsigned char> serverId;
     bool secure;
+    float inactivityTimer;
 };
 
 #define BUFFER_SIZE 8192
@@ -77,7 +80,7 @@ int main()
 
         unsigned char data[BUFFER_SIZE];
         int dataSize;
-        std::stringstream dataStream;
+        std::string dataString;
 
         idSize = zmq_recv(serverSocket, id, 256, 0);
         if(idSize <= 0)
@@ -90,45 +93,26 @@ int main()
         std::cout << "Received ID: " << idString << std::endl;
 
         dataSize = zmq_recv(serverSocket, data, 0, 0);                //Pusty recv, otwiera połączenie
-        do {
-            zmq_recv(serverSocket, id, ID_LENGTH, 0);          //Znowu ID, można porównać z tym wcześniej otrzymanym, powinno być unikatowe dla połączenia
-            assert(!idString.compare(std::string((char*)id, ID_LENGTH)));
-            dataSize = zmq_recv(serverSocket, data, BUFFER_SIZE, 0);
-            std::cout << "Received partial data, size: " << dataSize << std::endl;
-            dataStream.write((char*)data, dataSize);
-        } while(dataSize == BUFFER_SIZE);
+        zmq_recv(serverSocket, id, ID_LENGTH, 0);                     //Znowu ID, można porównać z tym wcześniej otrzymanym, powinno być unikatowe dla połączenia
+        assert(!idString.compare(std::string((char*)id, ID_LENGTH)));
+        dataSize = zmq_recv(serverSocket, data, BUFFER_SIZE, 0);
+        std::cout << "Received data, size: " << dataSize << std::endl;
         if(dataSize < 0)
         {
             std::cout << "Receive error: " << zmq_strerror(zmq_errno()) << std::endl;
             exit(1);
         }
-        dataStream << '\0';
-
-        //Parse request, connect to server, create a ProxyConnection object and store it.
-        //TODO
-
-        std::cout << "Data received:\n" << dataStream.str() << "\n" << std::endl;
-
-        char http_response [] =
-            "HTTP/1.0 200 OK\r\n"
-            "Content-Type: text/plain\r\n"
-            "\r\n"
-            "Hello, World!";
-        int sendSize = zmq_send(serverSocket, id, idSize, ZMQ_SNDMORE);
-        if(sendSize < 0)
+        if(dataSize > BUFFER_SIZE)
         {
-            std::cout << "ID send error: " << zmq_strerror(zmq_errno()) << std::endl;
-            exit(1);
+            //Respond with 419 Payload Too Large
         }
-        std::cout << "Sent ID, bytes:" << sendSize << std::endl;
-
-        sendSize = zmq_send(serverSocket, http_response, strlen(http_response), 0);
-        if(sendSize < 0)
+        else
         {
-            std::cout << "Data send error: " << zmq_strerror(zmq_errno()) << std::endl;
-            exit(1);
+            dataString = std::string(data, dataSize);
+            dataString.append('\0');
+
+            //TODO: Parse request, connect to server, create a ProxyConnection object and store it.
         }
-        std::cout << "Sent data, bytes:" << sendSize << std::endl;
 
         //Close connection
         zmq_send(serverSocket, id, idSize, ZMQ_SNDMORE);
