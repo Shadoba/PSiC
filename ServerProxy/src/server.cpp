@@ -12,49 +12,7 @@
 //https://linux.die.net/man/3/getaddrinfo FOR NAME RESOLUTION
 //ZMQ_STREAM socket mode - works differently to normal!
 
-class ProxyConnection
-{
-public:
-    ProxyConnection(void *clientSocket, std::string clientId, void *serverSocket, std::string serverId, bool secure)
-    {
-        this->clientSocket = clientSocket;
-        this->serverSocket = serverSocket;
-        this->secure = secure;
-    }
 
-    void *getClientSocket()
-    {
-        return clientSocket;
-    }
-
-    std::string getClientId()
-    {
-        return clientId;
-    }
-
-    void *getServerSocket()
-    {
-        return serverSocket;
-    }
-
-    std::string getServerId()
-    {
-        return serverId;
-    }
-
-    bool getSecure()
-    {
-        return secure;
-    }
-
-
-protected:
-    void *clientSocket;
-    std::string clientId;
-    void *serverSocket;
-    std::string serverId;
-    bool secure;
-};
 
 #define BUFFER_SIZE 8192
 #define ID_LENGTH 5
