@@ -82,7 +82,7 @@ void run()
         else
         {
             dataString = std::string(reinterpret_cast<char *>(data), dataSize);
-            dataString.append("");
+            dataString.append("\0");
 
             //TODO: Parse request, connect to server, create a ProxyConnection object and store it.
         }
