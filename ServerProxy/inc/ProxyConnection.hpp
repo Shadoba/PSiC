@@ -1,49 +1,30 @@
 #ifndef __PROXYCONNECTION__
 #define __PROXYCONNECTION__
 
-#include <array>
+#include <string>
 
 
 class ProxyConnection
 {
 public:
-    ProxyConnection(void *clientSocket, std::array clientId, void *serverSocket, std::array serverId, bool secure) : 
-        m_clientSocket(clientSocket), m_clientId(clientId), 
-        m_serverSocket(serverSocket), m_serverId(serverId), 
-        m_secure(secure)
-    {}
+    ProxyConnection(void *clientSocket, unsigned char * clientId, void *serverSocket, unsigned char * serverId, bool secure);
 
-    const void * getClientSocket() const
-    {
-        return clientSocket;
-    }
+    const void * getClientSocket() const;
 
-    const std::string getClientId() const
-    {
-        return clientId;
-    }
+    const std::basic_string <unsigned char> & getClientId() const;
 
-    const void * getServerSocket() const
-    {
-        return serverSocket;
-    }
+    const void * getServerSocket() const;
 
-    const std::string getServerId() const
-    {
-        return serverId;
-    }
+    const std::basic_string <unsigned char> & getServerId() const;
 
-    const bool getSecure() const
-    {
-        return secure;
-    }
+    const bool getSecure() const;
 
 
 protected:
     const void * m_clientSocket;
-    const std::array m_clientId;
+    const std::basic_string <unsigned char> m_clientId;
     const void * m_serverSocket;
-    const std::array m_serverId;
+    const std::basic_string <unsigned char> m_serverId;
     const bool m_secure;
 };
 
