@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "/home/staff/gach/zeroInstall/include/zmq.h"
+#include <zmq.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
