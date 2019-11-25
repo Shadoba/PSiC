@@ -1,6 +1,7 @@
 #include "Utility.hpp"
 
 #include <sstream>
+#include <iostream>
 
 Utility::Utility()
 {
@@ -25,16 +26,14 @@ std::vector<std::string> Utility::splitString(std::string input, std::string del
 {
     std::vector<std::string> result;
 
-    size_t inputSize = input.size();
     size_t delimiterSize = delimiter.size();
     size_t position = input.find(delimiter);
     result.push_back(input.substr(0, position));
-    
     while (position != std::string::npos)
     {
-        size_t previousPosition = position + delimiterSize;         //skip over the delimiter
-        position = input.find(delimiter, previousPosition);
-        result.push_back(input.substr(previousPosition, position));
+        size_t startPosition = position + delimiterSize;         //skip over the delimiter
+        position = input.find(delimiter, startPosition);
+        result.push_back(input.substr(startPosition, position - startPosition));
     }
 
     return result;
