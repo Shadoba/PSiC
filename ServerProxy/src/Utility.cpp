@@ -53,3 +53,16 @@ protocol Utility::getProtocolByString(const std::string input)
         return protocol::HTTP;
     return protocol::INVALID;
 }
+
+const Utility::ConstableMap<std::string, httpRequestMethod> Utility::httpRequestMethodMap= 
+{
+    {"CONNECT", httpRequestMethod::CONNECT},
+    {"GET", httpRequestMethod::OTHER},
+};
+
+const Utility::ConstableMap<std::string, protocol> Utility::protocolMap= 
+{
+    {"HTTP/1.0", protocol::HTTP},
+    {"HTTP/1.1", protocol::HTTP},
+    {"HTTP/2.0", protocol::HTTP},
+}
