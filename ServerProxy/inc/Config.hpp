@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#define LOGGER Config::getInstance().Logger
+#define LOGGER Config::getInstance().getLogger()
 
 class Config 
 {
@@ -19,7 +19,7 @@ public:
         static Config instance;
         return instance;
     }
-    const std::ostream & getLogger()
+    std::ostream & getLogger()
     {
         SERVER_ASSERT_MSG(nullptr == m_LoggerStream, "Server not configured")
         return *m_LoggerStream;

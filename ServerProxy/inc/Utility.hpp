@@ -4,6 +4,19 @@
 #include <string>
 #include <map>
 
+enum httpRequestMethod
+{
+    CONNECT = 0u,
+    OTHER,
+    INVALID = 255u
+};
+
+enum protocol
+{
+    HTTP = 0u,
+    INVALID = 255u
+};
+
 class Utility
 {
 public:
@@ -12,17 +25,4 @@ public:
     static httpRequestMethod getMethodByString(std::string input);
     static protocol getProtocolByString(std::string input);
     Utility() = delete;
-};
-
-enum httpRequestMethod
-{
-    CONNECT,
-    OTHER,
-    INVALID
-};
-
-enum protocol
-{
-    HTTP,
-    INVALID
 };
