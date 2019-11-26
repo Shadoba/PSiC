@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <type_traits>
 
 namespace httpRequest
 {
@@ -62,7 +63,8 @@ public:
         const T& operator[]( const Key& key ) const
         {
             auto retVal = this->find(key);
-            //SERVER_ASSERT_MSG(this->end() == retVal, "Element non existent")
+            if(not std::is_enum<T>::value)
+                SERVER_ASSERT_MSG(this->end() == retVal, "Element non existent");
             return (this->end() != retVal) ? (retVal->second) : ((T) 255u);
         }
     };

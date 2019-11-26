@@ -17,7 +17,7 @@ DatagramHandler::DatagramHandler(const std::string & datagram) :
     #if LOG_LEVEL > 5
     LOGGER << "Header split into: " << splitDatagram.size() << std::endl;
     #endif
-    SERVER_ASSERT_MSG(2 != splitDatagram.size(), "socket()")
+    SERVER_ASSERT_MSG(2 != splitDatagram.size(), "splitStringOnce() more than one split")
 
     std::string & header = splitDatagram[0];
     const std::string & body = splitDatagram[1];
@@ -31,6 +31,6 @@ DatagramHandler::DatagramHandler(const std::string & datagram) :
     m_OutputDatagram += headerEnd;
     m_OutputDatagram += body;
 
-    m_RequestMethod = headerProcessor.Method
-    m_Protocol = headerProcessor.Protocol
+    m_RequestMethod = headerProcessor.getHttpRequestMethodEnum();
+    m_Protocol = headerProcessor.getProtocolEnum();
 };
