@@ -24,7 +24,7 @@ public:
     static std::vector<std::string> splitString(std::string input, std::string delimiter);
     static httpRequestMethod getMethodByString(std::string input);
     static protocol getProtocolByString(std::string input);
-
+    
     template<
             class Key,
             class T,
@@ -62,6 +62,5 @@ public:
     static const ConstableMap<std::string, httpRequestMethod> httpRequestMethodMap;         //<? Contains supported request methods
     static const ConstableMap<std::string, protocol> protocolMap;                           //<? Contains supported protocols
 
-private:
-    Utility();
+    Utility() = delete;
 };
