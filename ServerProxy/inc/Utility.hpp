@@ -28,6 +28,7 @@ class Utility
 public:
     static std::vector<std::string> splitString(std::string input, char delimiter);
     static std::vector<std::string> splitString(std::string input, std::string delimiter);
+    static std::vector<std::string> splitStringOnce(std::string input, std::string delimiter);
     static httpRequest::httpRequestMethod getMethodByString(std::string input);
     static protocol::protocol getProtocolByString(std::string input);
     

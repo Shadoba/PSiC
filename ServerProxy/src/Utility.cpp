@@ -34,6 +34,23 @@ std::vector<std::string> Utility::splitString(const std::string input, std::stri
     return result;
 }
 
+std::vector<std::string> Utility::splitStringOnce(const std::string input, const std::string delimiter)
+{
+    std::vector<std::string> result;
+    size_t delimiterSize = delimiter.size();
+    size_t position = input.find(delimiter);
+    result.push_back(input.substr(0, position));
+    if(position == input.size() - delimiterSize)
+    {
+        result.push_back(std::string(""));
+    }
+    else
+    {
+        result.push_back(input.substr(position + delimiterSize));
+    }
+    return result;
+}
+
 httpRequest::httpRequestMethod Utility::getMethodByString(const std::string input)
 {
     if(!input.compare("CONNECT"))
