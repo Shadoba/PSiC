@@ -4,7 +4,13 @@
 
 #include <iostream>
 
-HeaderProcessor::HeaderProcessor(std::string head)
+HeaderProcessor::HeaderProcessor(std::string head) :
+    InputHeader(m_head),
+    Method(m_method),
+    Url(m_url),
+    Uri(m_uri),
+    Protocol(m_protocol),
+    OutputHeader(m_outputHeader)
 {
     m_head = head;
     pullDataFromHead(head);
@@ -12,29 +18,9 @@ HeaderProcessor::HeaderProcessor(std::string head)
         transformHead(head);
 }
 
-std::string HeaderProcessor::getMethod()
-{
-    return m_method;
-}
-
-std::string HeaderProcessor::getUrl()
-{
-    return m_url;
-}
-
-std::string HeaderProcessor::getProtocol()
-{
-    return m_protocol;
-}
-
-std::map<std::string, std::string> HeaderProcessor::getFields()
+std::map<std::string, std::string> HeaderProcessor::getFields() const
 {
     return m_fields;
-}
-
-std::string HeaderProcessor::getOutputHead()
-{
-    return m_outputHeader;
 }
 
 void HeaderProcessor::pullDataFromHead(std::string head)

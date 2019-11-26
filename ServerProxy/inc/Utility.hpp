@@ -6,8 +6,7 @@
 class Utility
 {
 public:
-    static std::vector<std::string> splitString(std::string input, char delimiter);
-    static std::vector<std::string> splitString(std::string input, std::string delimiter);
-private:
-    Utility();
+    static std::vector<std::string> splitString(const std::string input, const char delimiter);
+    static std::vector<std::string> splitString(const std::string input, const std::string delimiter);
+    Utility() = delete;
 };

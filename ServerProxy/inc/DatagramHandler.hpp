@@ -6,9 +6,7 @@
 class DatagramHandler
 {
 public:
-    explicit DatagramHandler(std::string datagram) :
-        InputDatagram(m_InputDatagram), OutputDatagram(m_OutputDatagram)
-    {};
+    explicit DatagramHandler(const std::string & datagram);
 
     //const std::string getInputDatagram() const;
     //const std::string getOutputDatagram() const;
