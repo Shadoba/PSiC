@@ -11,9 +11,7 @@ public:
     static std::vector<std::string> splitString(std::string input, std::string delimiter);
     static httpRequestMethod getMethodByString(std::string input);
     static protocol getProtocolByString(std::string input);
-
-private:
-    Utility();
+    Utility() = delete;
 };
 
 enum httpRequestMethod

@@ -8,14 +8,15 @@
 class HeaderProcessor
 {
 public:
-    HeaderProcessor(std::string head);
+    HeaderProcessor(const std::string head);
 
-    std::string getMethod();
-    std::string getUrl();
-    std::string getUri();
-    std::string getProtocol();
-    std::map<std::string, std::string> getFields();
-    std::string getOutputHead();
+    const std::string & InputHeader;
+    const std::string & Method;
+    const std::string & Url;
+    const std::string & Uri;
+    const std::string & Protocol;
+    const std::string & OutputHeader;
+    std::map<std::string, std::string> getFields() const;
 
 private:
     void pullDataFromHead(std::string head);
@@ -27,6 +28,7 @@ private:
     std::string m_url;
     std::string m_uri;
     std::string m_protocol;
-    std::map<std::string, std::string> m_fields;
     std::string m_outputHeader;
+
+    std::map<std::string, std::string> m_fields;
 };

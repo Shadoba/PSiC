@@ -3,12 +3,7 @@
 #include <sstream>
 #include <iostream>
 
-Utility::Utility()
-{
-
-}
-
-std::vector<std::string> Utility::splitString(std::string input, char delimiter)
+std::vector<std::string> Utility::splitString(const std::string input, const char delimiter)
 {
     std::vector<std::string> result;
     std::stringstream stream(input);
@@ -22,7 +17,7 @@ std::vector<std::string> Utility::splitString(std::string input, char delimiter)
     return result;
 }
 
-std::vector<std::string> Utility::splitString(std::string input, std::string delimiter)
+std::vector<std::string> Utility::splitString(const std::string input, std::string const delimiter)
 {
     std::vector<std::string> result;
 
