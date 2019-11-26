@@ -34,17 +34,30 @@ std::vector<std::string> Utility::splitString(const std::string input, std::stri
     return result;
 }
 
-httpRequestMethod Utility::getMethodByString(const std::string input)
+httpRequest::httpRequestMethod Utility::getMethodByString(const std::string input)
 {
     if(!input.compare("CONNECT"))
-        return httpRequestMethod::CONNECT;
+        return httpRequest::httpRequestMethod::CONNECT;
     if(!input.compare("GET"))
-        return httpRequestMethod::OTHER;
-    return httpRequestMethod::INVALID;
+        return httpRequest::httpRequestMethod::OTHER;
+    return httpRequest::httpRequestMethod::INVALID;
 }
-protocol Utility::getProtocolByString(const std::string input)
+protocol::protocol Utility::getProtocolByString(const std::string input)
 {
     if(input.find("HTTP/") != std::string::npos)
-        return protocol::HTTP;
-    return protocol::INVALID;
+        return protocol::protocol::HTTP;
+    return protocol::protocol::INVALID;
 }
+
+const Utility::ConstableMap<std::string, httpRequest::httpRequestMethod> Utility::httpRequestMethodMap= 
+{
+    {"CONNECT", httpRequest::httpRequestMethod::CONNECT},
+    {"GET", httpRequest::httpRequestMethod::OTHER},
+};
+
+const Utility::ConstableMap<std::string, protocol::protocol> Utility::protocolMap= 
+{
+    {"HTTP/1.0", protocol::protocol::HTTP},
+    {"HTTP/1.1", protocol::protocol::HTTP},
+    {"HTTP/2.0", protocol::protocol::HTTP},
+};

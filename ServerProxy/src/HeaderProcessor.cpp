@@ -70,3 +70,13 @@ void HeaderProcessor::calculateUri()
     else
         m_uri = m_url;
 }
+
+httpRequest::httpRequestMethod HeaderProcessor::getHttpRequestMethodEnum()
+{
+    return Utility::httpRequestMethodMap[m_method];
+}
+
+protocol::protocol HeaderProcessor::getProtocolEnum()
+{
+    return Utility::protocolMap[m_protocol];
+}
