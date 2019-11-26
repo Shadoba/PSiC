@@ -1,9 +1,6 @@
 #include <iostream>
 
 #include <zmq.h>
-#include <Config.hpp>
-#include <serverException.hpp>
-
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -12,6 +9,11 @@
 #include <cassert>
 #include <sstream>
 #include <vector>
+
+#include <Config.hpp>
+#include <serverException.hpp>
+#include <ProxyConnection.hpp>
+
 
 //https://linux.die.net/man/3/getaddrinfo FOR NAME RESOLUTION
 
@@ -46,8 +48,32 @@ void run()
         exit(1);
     }
 
+    std::vector<ProxyConnection> connections;
     while(true)
     {
+        //Up to 100 connections at a time - check on creation if vector is at 100?
+        //Respond with 413 if the request from client is too large - above 8192 bytes
+        //Close connections inactive for over 1 minute
+
+        //Recv NOBLOCK, skip the entire thing if no message available, increase an inactivity counter?
+        //Create DatagramHandler           //NEED TO CHECK IF THE MESSAGE IS A REQUEST OR RESPONSE!
+                                           //Based on where it came from? Then this has to be created later, after the connections check
+                                           //Based on the first line? Check if the third word is a number (status code). Can be done here.
+        //Discard and respond with error if invalid method/protocol
+        //If already in connections
+        //--No: (this means it's a request from the client)
+        //  resolve target IP
+        //  zmq_connect to target (if error respond to client with 502)
+        //  get ID frame
+        //  create ProxyConnection and add to vector
+        //  if appropriate, send data to server (do not send if it's CONNECT, just set up the ProxyConnection correctly)
+        //--Yes:
+        //  If the Proxyconnection is marked secure:
+        //  --No:
+        //    look into the request body and use that number algorithm we are required to implement
+        //  Send message to the other party
+
+        /*
         unsigned char id[256];
         int idSize;
 
@@ -90,6 +116,7 @@ void run()
         //Close connection
         zmq_send(serverSocket, id, idSize, ZMQ_SNDMORE);
         zmq_send(serverSocket, 0, 0, 0);
+        */
     }
 
     zmq_close(serverSocket);
