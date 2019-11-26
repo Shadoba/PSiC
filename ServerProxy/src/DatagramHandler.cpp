@@ -12,6 +12,9 @@ DatagramHandler::DatagramHandler(const std::string & datagram) :
     std::string & header = splitDatagram[0];
     const std::string & body = splitDatagram[1];
 
-    
+    HeaderProcessor headerProcessor(header);
 
+    m_OutputDatagram = headerProcessor.OutputHeader;
+    m_OutputDatagram += headerEnd;
+    m_OutputDatagram += body;
 };

@@ -8,8 +8,6 @@ class DatagramHandler
 public:
     explicit DatagramHandler(const std::string & datagram);
 
-    //const std::string getInputDatagram() const;
-    //const std::string getOutputDatagram() const;
     const std::string & InputDatagram;
     const std::string & OutputDatagram;
 protected:
