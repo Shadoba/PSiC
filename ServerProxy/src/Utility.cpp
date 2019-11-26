@@ -60,4 +60,4 @@ const Utility::ConstableMap<std::string, protocol::protocol> Utility::protocolMa
     {"HTTP/1.0", protocol::protocol::HTTP},
     {"HTTP/1.1", protocol::protocol::HTTP},
     {"HTTP/2.0", protocol::protocol::HTTP},
-}
+};
