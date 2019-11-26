@@ -1,6 +1,8 @@
 #ifndef __CONFIG__
 #define __CONFIG__
 
+#include <serverException.hpp>
+
 #include <iostream>
 
 #define LOGGER Config::getInstance().Logger
@@ -17,9 +19,13 @@ public:
         static Config instance;
         return instance;
     }
-    const std::ostream & Logger;
+    const std::ostream & getLogger()
+    {
+        SERVER_ASSERT_MSG(nullptr == m_LoggerStream, "Server not configured")
+        return *m_LoggerStream;
+    }
 private:
-    Config() : Logger(*m_LoggerStream){}
+    Config() { m_LoggerStream = nullptr; }
     std::ostream * m_LoggerStream;
 };
 
