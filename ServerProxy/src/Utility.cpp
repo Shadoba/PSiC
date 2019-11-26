@@ -38,3 +38,18 @@ std::vector<std::string> Utility::splitString(std::string input, std::string del
 
     return result;
 }
+
+httpRequestMethod Utility::getMethodByString(const std::string input)
+{
+    if(!input.compare("CONNECT"))
+        return httpRequestMethod::CONNECT;
+    if(!input.compare("GET"))
+        return httpRequestMethod::OTHER;
+    return httpRequestMethod::INVALID;
+}
+protocol Utility::getProtocolByString(const std::string input)
+{
+    if(input.find("HTTP/") != std::string::npos)
+        return protocol::HTTP;
+    return protocol::INVALID;
+}

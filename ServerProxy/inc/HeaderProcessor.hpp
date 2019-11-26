@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 
+#include "Utility.hpp"
+
 class HeaderProcessor
 {
 public:
