@@ -18,8 +18,8 @@ public:
     const std::string & OutputHeader;
     std::map<std::string, std::string> getFields() const;
 
-    httpRequestMethod getHttpRequestMethodEnum();
-    protocol getProtocolEnum();
+    httpRequest::httpRequestMethod getHttpRequestMethodEnum();
+    protocol::protocol getProtocolEnum();
 
 private:
     void pullDataFromHead(std::string head);

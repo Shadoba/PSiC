@@ -4,26 +4,32 @@
 #include <string>
 #include <map>
 
-enum httpRequestMethod
+namespace httpRequest
 {
-    CONNECT = 0u,
-    OTHER,
-    INVALID = 255u
-};
+    enum httpRequestMethod
+    {
+        CONNECT = 0u,
+        OTHER,
+        INVALID = 255u
+    };
+}
 
-enum protocol
+namespace protocol
 {
-    HTTP = 0u,
-    INVALID = 255u
-};
+    enum protocol
+    {
+        HTTP = 0u,
+        INVALID = 255u
+    };
+}
 
 class Utility
 {
 public:
     static std::vector<std::string> splitString(std::string input, char delimiter);
     static std::vector<std::string> splitString(std::string input, std::string delimiter);
-    static httpRequestMethod getMethodByString(std::string input);
-    static protocol getProtocolByString(std::string input);
+    static httpRequest::httpRequestMethod getMethodByString(std::string input);
+    static protocol::protocol getProtocolByString(std::string input);
     
     template<
             class Key,
@@ -59,8 +65,8 @@ public:
             return (this->end() != retVal) ? (retVal->second) : ((T) 255u);
         }
     };
-    static const ConstableMap<std::string, httpRequestMethod> httpRequestMethodMap;         //<? Contains supported request methods
-    static const ConstableMap<std::string, protocol> protocolMap;                           //<? Contains supported protocols
+    static const ConstableMap<std::string, httpRequest::httpRequestMethod> httpRequestMethodMap;         //<? Contains supported request methods
+    static const ConstableMap<std::string, protocol::protocol> protocolMap;                           //<? Contains supported protocols
 
     Utility() = delete;
 };

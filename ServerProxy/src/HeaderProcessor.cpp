@@ -71,12 +71,12 @@ void HeaderProcessor::calculateUri()
         m_uri = m_url;
 }
 
-httpRequestMethod HeaderProcessor::getHttpRequestMethodEnum()
+httpRequest::httpRequestMethod HeaderProcessor::getHttpRequestMethodEnum()
 {
     return Utility::httpRequestMethodMap[m_method];
 }
 
-protocol HeaderProcessor::getProtocolEnum()
+protocol::protocol HeaderProcessor::getProtocolEnum()
 {
     return Utility::protocolMap[m_protocol];
 }
