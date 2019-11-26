@@ -77,9 +77,9 @@ void HeaderProcessor::calculateUri()
     {
         position = m_url.find('/', position + 2);
         if(position == std::string::npos)                   //Jeśli poza "http://" nie ma '/', to musimy dodać sam '/'
-            m_uri = std::string(" /");
+            m_uri = std::string("/");
         else
-            m_uri = std::string(" " + m_url.substr(position));
+            m_uri = std::string(m_url.substr(position));
     }
     else
         m_uri = m_url;
