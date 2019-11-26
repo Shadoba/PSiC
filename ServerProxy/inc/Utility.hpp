@@ -5,6 +5,7 @@
 #include <map>
 #include <type_traits>
 
+#define _INVALID_ 255u
 namespace httpRequest
 {
     enum httpRequestMethod
@@ -58,14 +59,14 @@ public:
          * @brief overloaded subscript operator, can return const value
          * 
          * @param key key
-         * @return const T& return value
+         * @return const T return value
          */
-        const T& operator[]( const Key& key ) const
+        const T operator[]( const Key& key ) const
         {
             auto retVal = this->find(key);
             if(not std::is_enum<T>::value)
                 SERVER_ASSERT_MSG(this->end() == retVal, "Element non existent");
-            return (this->end() != retVal) ? (retVal->second) : ((T) 255u);
+            return (this->end() != retVal) ? (retVal->second) : ((T) _INVALID_);
         }
     };
     static const ConstableMap<std::string, httpRequest::httpRequestMethod> httpRequestMethodMap;         //<? Contains supported request methods

@@ -1,7 +1,5 @@
 #include "HeaderProcessor.hpp"
 
-#include "Utility.hpp"
-
 #include <iostream>
 
 HeaderProcessor::HeaderProcessor(std::string head) :

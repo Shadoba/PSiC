@@ -1,6 +1,7 @@
 #include <DatagramHandler.hpp>
 #include <HeaderProcessor.hpp>
 #include <Config.hpp>
+#include <serverException.hpp>
 
 DatagramHandler::DatagramHandler(const std::string & datagram) :
     InputDatagram(m_InputDatagram), 
