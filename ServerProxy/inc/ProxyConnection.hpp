@@ -8,6 +8,7 @@ class ProxyConnection
 {
 public:
     ProxyConnection(void *clientSocket, unsigned char * clientId, void *serverSocket, unsigned char * serverId, bool secure);
+    ~ProxyConnection();
 
     const void * getClientSocket() const;
 

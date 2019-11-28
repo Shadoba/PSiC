@@ -1,4 +1,7 @@
 #include <ProxyConnection.hpp>
+
+#include <zmq.h>
+
 #include <Config.hpp>
 
 ProxyConnection::ProxyConnection(void *clientSocket, unsigned char * clientId, void *serverSocket, unsigned char * serverId, bool secure) : 
@@ -9,6 +12,11 @@ ProxyConnection::ProxyConnection(void *clientSocket, unsigned char * clientId, v
     #if LOG_LEVEL == 1
         LOGGER << "New connection" << std::endl;
     #endif
+}
+
+ProxyConnection::~ProxyConnection()
+{
+    zmq_close(m_serverSocket);
 }
 
 const void * ProxyConnection::getClientSocket() const
