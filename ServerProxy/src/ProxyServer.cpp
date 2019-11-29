@@ -1,11 +1,20 @@
 #include <ProxyServer.hpp>
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #include <zmq.h>
 #include <iostream>
 #include <sstream>
 
 #define BUFFER_SIZE 8192
 #define ID_LENGTH 5
+
+
+//
+//SERVER SENDS AND RECEIVES ON THE SAME SOCKET, do zmq_connect(m_serverSocket) to send. A "connection", lasts for pretty much a single transfer, so clients will be reopening them constantly, be wary of those 0-frames
+//
+
 
 ProxyServer::ProxyServer(const std::string str)
 {
@@ -67,8 +76,7 @@ void ProxyServer::run()
                 continue;
             else
             {
-                std::cout << zmq_strerror(zmq_errno()) << std::endl;
-                exit(1);
+                handleError(0);
             }
         }
         std::string idString = std::string((char*)id, ID_LENGTH);
@@ -85,14 +93,13 @@ void ProxyServer::run()
                 receiveStatus = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
                 if(receiveStatus < 0)
                 {
-                    std::cout << zmq_strerror(zmq_errno()) << std::endl;
-                    exit(1);
+                    handleError(receiveStatus);
                 }
 
                 if(receiveStatus > BUFFER_SIZE)
                 {
-                    //respondWith413(idString);
-                    //close connection? (send a 0 length message on this id)
+                    respondWith413(idString);
+                    closeConnection(idString);
                     break;
                 }
 
@@ -100,13 +107,13 @@ void ProxyServer::run()
                 
                 if(connections.at(i).getSecure())
                 {
-                    //sendMessageToPeer(connections.at(i).getServerId(), dataStream.str());         //Do not involve DatagramHandler since the message is encrypted anyway
+                    sendMessageToPeer(connections.at(i).getServerId(), dataStream.str());
                 }
                 else
                 {
                     dataStream.write("\0");
                     //modifyBody(datagramHandler);                                                  //This could be a method of DatagramHandler, so datagramHandler.modifyBody(), or it can do it  on its own
-                    //sendMessageToPeer(connections.at(i).getServerId(), datagramHandler);
+                    sendMessageToPeer(connections.at(i).getServerId(), datagramHandler.OutputDatagram);
                 }
                 
                 break;
@@ -115,12 +122,11 @@ void ProxyServer::run()
             {
                 do
                 {
-                    zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                                       //Id frame
+                    zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                                     //Id frame
                     receiveStatus = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
                     if(receiveStatus < 0)
                     {
-                        std::cout << zmq_strerror(zmq_errno()) << std::endl;
-                        exit(1);
+                        handleError(receiveStatus);
                     }
                     if(receiveStatus < BUFFER_SIZE)
                         dataStream.write((char*)buffer, receiveStatus);
@@ -128,32 +134,30 @@ void ProxyServer::run()
                         dataStream.write((char*)buffer, BUFFER_SIZE);
                 } while(receiveStatus > BUFFER_SIZE);
 
-                //sendMessageToPeer(connections.at(i).getClientId());                               //since we're only checking the body of clinet requests, this one can just be sent
+                sendMessageToPeer(connections.at(i).getClientId(), dataStream.str());               //since we're only checking the body of clinet requests, this one can just be sent
 
                 break;
             }
             else                                                                                    //Since the ID isn't in connections, it's a new connection from a client
             {
-                zmq_recv(m_serverSocket, buffer, 0, 0);                                               //To handle the empty "open connection" message
-                idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                                //Create a method bundling receive and error handling?
+                zmq_recv(m_serverSocket, buffer, 0, 0);                                             //To handle the empty "open connection" message
+                idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                              //Create a method bundling receive and error handling?
                 if(idStatus < 0)
                 {
-                    std::cout << zmq_strerror(zmq_errno()) << std::endl;
-                    exit(1);
+                    handleError(idStatus);
                 }
                 //compare IDs?
 
                 receiveStatus = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
                 if(receiveStatus < 0)
                 {
-                    std::cout << zmq_strerror(zmq_errno()) << std::endl;
-                    exit(1);
+                    handleError(receiveStatus);
                 }
 
                 if(receiveStatus > BUFFER_SIZE)
                 {
-                    //respondWith413(idString);
-                    //close connection? (send a 0 length message on this id)
+                    respondWith413(idString);
+                    closeConnection(idString);
                     break;
                 }
                 else
@@ -163,6 +167,15 @@ void ProxyServer::run()
                     //DatagramHandler datagramHandler = DatagramHandler(message.str());
                     //Extract server url, do name resolution, do zmq_connect
                     //Create a ProxyConnection and add it to the vector
+                    //if(openConnection(url).size() > 0)
+                    //{
+                    //     //create connection and stuff
+                    //}
+                    //else
+                    //{
+                    //     respondWith502(idString);   //client ID
+                    //     closeConnection(idString);
+                    //}
                     //if it's not a CONNECT modify body and send to server
                 }
                 
@@ -215,4 +228,67 @@ void ProxyServer::run()
         zmq_send(serverSocket, 0, 0, 0);
         */
     }
+}
+
+std::string ProxyServer::openConnection(std::string url)
+{
+    std::string address;
+    int status = 0;
+    addrinfo *result;
+    status = getaddrinfo(NULL, url.c_str(), NULL, &result);
+    if(status != 0)
+        handleError(status);
+    for(addrinfo *address = result; address != NULL; address = address->ai_next)
+    {
+        address = std::string("tcp://") + std::string(rp->ai_addr, rp->ai_addrlen);
+        std::cout << address << std::endl;
+        status = zmq_connect(m_serverSocket, address);
+        if(status == 0)
+            break;
+    }
+    if(status != 0)
+        return std::string();
+
+    unsigned char idBuffer[ID_LENGTH];
+    size_t intSize = ID_LENGTH;
+    status = zmq_getsockopt(m_serverSocket, ZMQ_ROUTING_ID, idBuffer, &intSize);
+    if(status != 0)
+        handleError(status);
+    return std::string(idBuffer, ID_LENGTH);
+}
+
+void ProxyServer::sendMessage(std::string id, std::string message)
+{
+    zmq_send(m_serverSocket, id.c_str(), id.size, ZMQ_SNDMORE);
+    zmq_send(m_serverSocket, message.c_str(), message.size(), 0);
+}
+
+void ProxyServer::closeConnection(std::string id)
+{
+    zmq_send(m_serverSocket, id.c_str(), ID_LENGTH, ZMQ_SNDMORE);
+    zmq_send(m_serverSocket, 0, 0, 0);
+}
+
+void ProxyServer::respondWith419(std::string id)
+{
+    std::string toSend = std::string("HTTP/1.1 413 Payload Too Large\r\n"
+                                     "Content-Type: text/plain\r\n"
+                                     "\r\n"
+                                     "Payload Too Large");
+    sendMessage(std::string id, toSend);
+}
+
+void ProxyServer::respondWith502(std::string id)
+{
+    std::string toSend = std::string("HTTP/1.1 502 Bad Gateway\r\n"
+                                     "Content-Type: text/plain\r\n"
+                                     "\r\n"
+                                     "Bad Gateway");
+    sendMessage(std::string id, toSend);
+}
+
+void ProxyServer::handleError(int status)
+{
+    std::cout << "Error during name resolution/establishing connection: " << zmq_strerror(zmq_errno()) << std::endl;
+    exit(1);
 }
