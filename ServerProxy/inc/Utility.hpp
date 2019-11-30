@@ -73,4 +73,9 @@ public:
     static const ConstableMap<std::string, protocol::protocol> protocolMap;                           //<? Contains supported protocols
 
     Utility() = delete;
+
+    // struct UINT128
+    // {
+    //     uint64_t 
+    // }
 };
