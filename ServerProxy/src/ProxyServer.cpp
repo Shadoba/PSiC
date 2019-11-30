@@ -115,7 +115,7 @@ void ProxyServer::run()
                 }
                 else
                 {
-                    dataStream.write((char*)"\0");
+                    dataStream.put('\0');
                     DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
                     //modifyBody(datagramHandler);                                                  //This could be a method of DatagramHandler, so datagramHandler.modifyBody(), or it can do it  on its own
                     sendMessage(m_connections.at(i)->getServerId(), datagramHandler.OutputDatagram);
@@ -168,7 +168,7 @@ void ProxyServer::run()
                 else
                 {
                     dataStream.write((char*)buffer, BUFFER_SIZE);
-                    dataStream.write((char*)"\0");
+                    dataStream.put('\0');
                     DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
 
                     //Extract server url, do name resolution, do zmq_connect
@@ -194,19 +194,22 @@ void ProxyServer::run()
 std::string ProxyServer::openConnection(std::string url)
 {
     std::string address;
-    int status = 0;
+    int status;
     addrinfo *result;
     status = getaddrinfo(NULL, url.c_str(), NULL, &result);
     if(status != 0)
         handleError(status);
     for(addrinfo *addressInfo = result; addressInfo != NULL; addressInfo = addressInfo->ai_next)
     {
-        address = std::string("tcp://") + std::string(inet_ntoa(addressInfo->ai_addr->sin_addr), (int)addressInfo->ai_addrlen);
+        sockaddr_in *addrin = (sockaddr_in*)addressInfo->ai_addr;
+        address = std::string("tcp://") + std::string(inet_ntoa(addrin->sin_addr));
+        address.append("\0");
         std::cout << address << std::endl;
-        status = zmq_connect(m_serverSocket, address);
+        status = zmq_connect(m_serverSocket, address.c_str());
         if(status == 0)
             break;
     }
+
     freeaddrinfo(result);
     if(status != 0)
         return std::string();
@@ -221,7 +224,7 @@ std::string ProxyServer::openConnection(std::string url)
 
 void ProxyServer::sendMessage(std::string id, std::string message)
 {
-    zmq_send(m_serverSocket, id.c_str(), id.size, ZMQ_SNDMORE);
+    zmq_send(m_serverSocket, id.c_str(), id.size(), ZMQ_SNDMORE);
     zmq_send(m_serverSocket, message.c_str(), message.size(), 0);
 }
 
