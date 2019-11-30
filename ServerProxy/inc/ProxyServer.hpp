@@ -19,7 +19,7 @@ private:
     void closeConnection(std::string id);
     void dropConnection(unsigned int i);
     void respondWith413(std::string id);
-    void respondWith501(std::string id)
+    void respondWith501(std::string id);
     void respondWith502(std::string id);
     void handleError(int status);
 
