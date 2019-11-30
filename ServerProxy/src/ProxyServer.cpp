@@ -2,6 +2,8 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <zmq.h>
 #include <iostream>
@@ -199,7 +201,7 @@ std::string ProxyServer::openConnection(std::string url)
         handleError(status);
     for(addrinfo *addressInfo = result; addressInfo != NULL; addressInfo = addressInfo->ai_next)
     {
-        address = std::string("tcp://") + std::string(inet_ntoa(addressInfo->ai_add->sin_addr), (int)addressInfo->ai_addrlen);
+        address = std::string("tcp://") + std::string(inet_ntoa(addressInfo->ai_addr->sin_addr), (int)addressInfo->ai_addrlen);
         std::cout << address << std::endl;
         status = zmq_connect(m_serverSocket, address);
         if(status == 0)
