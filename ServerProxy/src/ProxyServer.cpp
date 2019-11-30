@@ -215,12 +215,12 @@ void ProxyServer::run()
                     {
                         if(datagramHandler.RequestMethod != httpRequest::httpRequestMethod::CONNECT)
                         {
-                            m_connections.push_back(ProxyConnection(idString, serverId, false));
+                            m_connections.push_back(new ProxyConnection(idString, serverId, false));
                             sendMessage(serverId, dataStream.str());
                         }
                         else
                         {
-                            m_connections.push_back(ProxyConnection(idString, serverId, true));
+                            m_connections.push_back(new ProxyConnection(idString, serverId, true));
                         }
                     }
                     else
