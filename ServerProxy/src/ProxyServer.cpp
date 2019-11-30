@@ -113,7 +113,7 @@ void ProxyServer::run()
                 }
                 else
                 {
-                    dataStream.write('\0');
+                    dataStream.write((char*)"\0");
                     DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
                     //modifyBody(datagramHandler);                                                  //This could be a method of DatagramHandler, so datagramHandler.modifyBody(), or it can do it  on its own
                     sendMessage(m_connections.at(i)->getServerId(), datagramHandler.OutputDatagram);
@@ -166,7 +166,7 @@ void ProxyServer::run()
                 else
                 {
                     dataStream.write((char*)buffer, BUFFER_SIZE);
-                    dataStream.write('\0');
+                    dataStream.write((char*)"\0");
                     DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
 
                     //Extract server url, do name resolution, do zmq_connect
@@ -199,12 +199,13 @@ std::string ProxyServer::openConnection(std::string url)
         handleError(status);
     for(addrinfo *addressInfo = result; addressInfo != NULL; addressInfo = addressInfo->ai_next)
     {
-        address = std::string("tcp://") + std::string(addressInfo->ai_addr, addressInfo->ai_addrlen);
+        address = std::string("tcp://") + std::string(inet_ntoa(addressInfo->ai_add->sin_addr), (int)addressInfo->ai_addrlen);
         std::cout << address << std::endl;
         status = zmq_connect(m_serverSocket, address);
         if(status == 0)
             break;
     }
+    freeaddrinfo(result);
     if(status != 0)
         return std::string();
 
