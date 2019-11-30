@@ -3,6 +3,7 @@
 
 #include <string>
 #include <time.h>
+#include <ctime>
 
 /**
  * @brief Class ProxyConnection stores data on 
