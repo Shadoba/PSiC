@@ -8,6 +8,7 @@ DatagramHandler::DatagramHandler(const std::string & datagram) :
     OutputDatagram(m_OutputDatagram),
     RequestMethod(m_RequestMethod),
     Protocol(m_Protocol),
+    Url(m_url),
     m_InputDatagram(datagram)
 {
     /* Splits datagram to header and    *
@@ -28,10 +29,42 @@ DatagramHandler::DatagramHandler(const std::string & datagram) :
     /* Reassemble output datagram from  *
      * headerProcessor processed data   *
      * and assign protol and method enum*/
+    m_RequestMethod = headerProcessor.getHttpRequestMethodEnum();
+    m_Protocol = headerProcessor.getProtocolEnum();
+    m_url = headerProcessor.Url;
+
+    if(httpRequest::CONNECT != m_RequestMethod)
+        int result = processDatagramBody(body);
+
     m_OutputDatagram = headerProcessor.OutputHeader;
     m_OutputDatagram += headerEnd;
     m_OutputDatagram += body;
 
-    m_RequestMethod = headerProcessor.getHttpRequestMethodEnum();
-    m_Protocol = headerProcessor.getProtocolEnum();
 };
+
+// int DatagramHandler::processDatagramBody(std::string & body)
+// {
+//     __int128 numberStorage;
+
+//     std::string bodyTmp = body;
+//     int numPos = 0;
+//     int numPosAbsoulte = 0;
+//     //bodyTmp.erase(std::remove(bodyTmp.begin(), bodyTmp.end(), ' '), bodyTmp.end());
+//     while(numPos = bodyTmp.find_first_of("0123456789"))
+//     {
+//         int counter = 0;
+//         do
+//         {
+//             counter++;
+//         } while (validateNumber);
+
+//         if(26 <= counter)
+//         {
+//             break;
+//         }
+//         else
+//         {
+//             /* code */
+//         }
+//     }
+// }
