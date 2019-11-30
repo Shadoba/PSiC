@@ -29,7 +29,7 @@ protected:
     std::string m_OutputDatagram;                   //<? Output datagram
     httpRequest::httpRequestMethod m_RequestMethod; //<? Request method
     protocol::protocol m_Protocol;                  //<? Protocol
-    std::string m_url                               //<? url handle
+    std::string m_url;                              //<? url handle
 
 private:
     static int processDatagramBody(std::string & body);
