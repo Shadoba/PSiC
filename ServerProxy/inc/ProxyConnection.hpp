@@ -12,7 +12,7 @@
 class ProxyConnection
 {
 public:
-    ProxyConnection(unsigned char * clientId, unsigned char * serverId, bool secure);
+    ProxyConnection(std::string clientId, std::string serverId, bool secure);
     ~ProxyConnection();
 
     /**
