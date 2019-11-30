@@ -106,13 +106,17 @@ int DatagramHandler::processDatagramBody(std::string & body)
         }
     }
 
-    int result = calculate(numberStorage);
+    int result = 0;
     /* reached end of string and no number stream was detected */
-    if(!bodyTmp.empty() && 1 == result)
+    if(!bodyTmp.empty())
     {
-        for(int i = 0; i < 26; i++)
+        result = calculate(numberStorage);
+        if(1 == result)
         {
-            body[numPosArray[i]] = '1';
+            for(int i = 0; i < 26; i++)
+            {
+                body[numPosArray[i]] = '1';
+            }
         }
     }
 
