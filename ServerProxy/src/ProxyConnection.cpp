@@ -4,9 +4,11 @@
 
 #include <Config.hpp>
 
-ProxyConnection::ProxyConnection(unsigned char * clientId, unsigned char * serverId, bool secure) : 
-    m_clientId((char*)clientId, 5), m_serverId((char*)serverId, 5), m_secure(secure)
+ProxyConnection::ProxyConnection(std::string clientId, std::string serverId, bool secure) : 
+    m_clientId(clientId), m_serverId(serverId), m_secure(secure)
 {
+    m_timer = std::time(NULL);
+
     #if LOG_LEVEL == 1
         LOGGER << "New connection" << std::endl;
     #endif
@@ -30,4 +32,19 @@ const std::string & ProxyConnection::getServerId() const
 const bool ProxyConnection::getSecure() const
 {
     return m_secure;
+}
+
+const time_t ProxyConnection::getTimer() const
+{
+    return m_timer;
+}
+
+void ProxyConnection::setTime(const time_t newTime)
+{
+    m_timer = newTime;
+}
+
+void ProxyConnection::updateTimer()
+{
+    m_timer = std::time(NULL);
 }
