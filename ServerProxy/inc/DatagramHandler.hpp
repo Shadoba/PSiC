@@ -2,19 +2,32 @@
 #define __DATAGRAMHANDLER__
 
 #include <string>
+#include <Utility.hpp>
 
+/**
+ * @brief Class DatagramHandler holds input and 
+ *  output datagram, handles processing
+ */
 class DatagramHandler
 {
 public:
+    /**
+     * @brief Construct a new datagram handler object
+     * 
+     * @param datagram std::string [IN] input datagram
+     */
     explicit DatagramHandler(const std::string & datagram);
 
-    const std::string & InputDatagram;
-    const std::string & OutputDatagram;
+    const std::string & InputDatagram;                  //<? Input datagram handle
+    const std::string & OutputDatagram;                 //<? Output datagram handle
+    const httpRequest::httpRequestMethod & RequestMethod;//<? Request method handle
+    const protocol::protocol & Protocol;                //<? Protocol handle
+
 protected:
-    const std::string m_InputDatagram;
-    std::string m_OutputDatagram;
-
-
+    const std::string m_InputDatagram;              //<? Input datagram
+    std::string m_OutputDatagram;                   //<? Output datagram
+    httpRequest::httpRequestMethod m_RequestMethod; //<? Request method
+    protocol::protocol m_Protocol;                  //<? Protocol
 };
 
 #endif /* __DATAGRAMHANDLER__ */
