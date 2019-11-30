@@ -4,10 +4,8 @@
 
 #include <Config.hpp>
 
-ProxyConnection::ProxyConnection(void *clientSocket, unsigned char * clientId, void *serverSocket, unsigned char * serverId, bool secure) : 
-    m_clientSocket(clientSocket), m_clientId(clientId, 5), 
-    m_serverSocket(serverSocket), m_serverId(serverId, 5),
-    m_secure(secure)
+ProxyConnection::ProxyConnection(unsigned char * clientId, unsigned char * serverId, bool secure) : 
+    m_clientId(clientId, 5), m_serverId(serverId, 5), m_secure(secure)
 {
     #if LOG_LEVEL == 1
         LOGGER << "New connection" << std::endl;
@@ -16,7 +14,7 @@ ProxyConnection::ProxyConnection(void *clientSocket, unsigned char * clientId, v
 
 ProxyConnection::~ProxyConnection()
 {
-    
+
 }
 
 const std::basic_string<unsigned char> & ProxyConnection::getClientId() const
