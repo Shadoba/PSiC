@@ -16,22 +16,12 @@ ProxyConnection::ProxyConnection(void *clientSocket, unsigned char * clientId, v
 
 ProxyConnection::~ProxyConnection()
 {
-    zmq_close(m_serverSocket);
-}
-
-const void * ProxyConnection::getClientSocket() const
-{
-    return m_clientSocket;
+    
 }
 
 const std::basic_string<unsigned char> & ProxyConnection::getClientId() const
 {
     return m_clientId;
-}
-
-const void * ProxyConnection::getServerSocket() const
-{
-    return m_serverSocket;
 }
 
 const std::basic_string<unsigned char> & ProxyConnection::getServerId() const

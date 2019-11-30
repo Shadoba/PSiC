@@ -7,6 +7,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <DatagramHandler.hpp>
+
 #define BUFFER_SIZE 8192
 #define ID_LENGTH 5
 
@@ -164,7 +166,8 @@ void ProxyServer::run()
                 {
                     message.write((char*)buffer, BUFFER_SIZE);
                     message.write("\0");
-                    //DatagramHandler datagramHandler = DatagramHandler(message.str());
+                    DatagramHandler datagramHandler = DatagramHandler(message.str());
+
                     //Extract server url, do name resolution, do zmq_connect
                     //Create a ProxyConnection and add it to the vector
                     //if(openConnection(url).size() > 0)
@@ -182,51 +185,6 @@ void ProxyServer::run()
                 break;
             }
         }
-
-        /*
-        unsigned char id[256];
-        int idSize;
-
-        unsigned char data[BUFFER_SIZE];
-        int dataSize;
-        std::string dataString;
-
-        idSize = zmq_recv(serverSocket, id, 256, 0);
-        if(idSize <= 0)
-        {
-            std::cout << "Receive error: " << zmq_strerror(zmq_errno()) << std::endl;
-            exit(1);
-        }
-        assert(idSize == ID_LENGTH);
-        std::string idString((char*)id, ID_LENGTH);
-        std::cout << "Received ID: " << idString << std::endl;
-
-        dataSize = zmq_recv(serverSocket, data, 0, 0);                //Pusty recv, otwiera połączenie
-        zmq_recv(serverSocket, id, ID_LENGTH, 0);                     //Znowu ID, można porównać z tym wcześniej otrzymanym, powinno być unikatowe dla połączenia
-        assert(!idString.compare(std::string((char*)id, ID_LENGTH)));
-        dataSize = zmq_recv(serverSocket, data, BUFFER_SIZE, 0);
-        std::cout << "Received data, size: " << dataSize << std::endl;
-        if(dataSize < 0)
-        {
-            std::cout << "Receive error: " << zmq_strerror(zmq_errno()) << std::endl;
-            exit(1);
-        }
-        if(dataSize > BUFFER_SIZE)
-        {
-            //Respond with 419 Payload Too Large
-        }
-        else
-        {
-            dataString = std::string(reinterpret_cast<char *>(data), dataSize);
-            dataString.append("\0");
-
-            //TODO: Parse request, connect to server, create a ProxyConnection object and store it.
-        }
-
-        //Close connection
-        zmq_send(serverSocket, id, idSize, ZMQ_SNDMORE);
-        zmq_send(serverSocket, 0, 0, 0);
-        */
     }
 }
 
