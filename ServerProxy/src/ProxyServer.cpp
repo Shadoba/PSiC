@@ -32,8 +32,8 @@ ProxyServer::ProxyServer(const std::string str)
 
 ProxyServer::~ProxyServer()
 {
-    for(int i = 0; i < connections.size(); i++)
-        delete connections.at(i);
+    for(int i = 0; i < m_connections.size(); i++)
+        delete m_connections.at(i);
     zmq_close(m_serverSocket);
     zmq_ctx_destroy(m_context);
 }
@@ -88,9 +88,9 @@ void ProxyServer::run()
         //PROBLEM: How can you map incoming messages to their recipents, if one client can be connected to many servers, to the same one many times, and one server to many clients
         //The entire thing below needs a rewrite because I didn't think of ^
 
-        for(unsigned int i = 0; i < connections.size(); i++)
+        for(unsigned int i = 0; i < m_connections.size(); i++)
         {
-            if(!connections.at(i).getClientId().compare(idString))                                  //Message from existing client
+            if(!m_connections.at(i).getClientId().compare(idString))                                  //Message from existing client
             {
                 receiveStatus = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
                 if(receiveStatus < 0)
@@ -107,20 +107,20 @@ void ProxyServer::run()
 
                 dataStream.write((char*)buffer, receiveStatus);
                 
-                if(connections.at(i).getSecure())
+                if(m_connections.at(i).getSecure())
                 {
-                    sendMessageToPeer(connections.at(i).getServerId(), dataStream.str());
+                    sendMessageToPeer(m_connections.at(i).getServerId(), dataStream.str());
                 }
                 else
                 {
                     dataStream.write("\0");
                     //modifyBody(datagramHandler);                                                  //This could be a method of DatagramHandler, so datagramHandler.modifyBody(), or it can do it  on its own
-                    sendMessageToPeer(connections.at(i).getServerId(), datagramHandler.OutputDatagram);
+                    sendMessageToPeer(m_connections.at(i).getServerId(), datagramHandler.OutputDatagram);
                 }
                 
                 break;
             }
-            else if(!connections.at(i).getServerId().compare(idString))                             //Message from server
+            else if(!m_connections.at(i).getServerId().compare(idString))                             //Message from server
             {
                 do
                 {
@@ -136,7 +136,7 @@ void ProxyServer::run()
                         dataStream.write((char*)buffer, BUFFER_SIZE);
                 } while(receiveStatus > BUFFER_SIZE);
 
-                sendMessageToPeer(connections.at(i).getClientId(), dataStream.str());               //since we're only checking the body of clinet requests, this one can just be sent
+                sendMessageToPeer(m_connections.at(i).getClientId(), dataStream.str());               //since we're only checking the body of clinet requests, this one can just be sent
 
                 break;
             }
@@ -227,7 +227,7 @@ void ProxyServer::closeConnection(std::string id)
     zmq_send(m_serverSocket, 0, 0, 0);
 }
 
-void ProxyServer::respondWith419(std::string id)
+void ProxyServer::respondWith413(std::string id)
 {
     std::string toSend = std::string("HTTP/1.1 413 Payload Too Large\r\n"
                                      "Content-Type: text/plain\r\n"
