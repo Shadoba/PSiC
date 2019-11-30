@@ -234,7 +234,7 @@ void ProxyServer::run()
 
         for(unsigned int i = 0; i < m_connections.size(); i++)
         {
-            if(difftime(m_connections.at(i)->getTimer(), std::time()) > 60.0f)
+            if(difftime(m_connections.at(i)->getTimer(), std::time(NULL)) > 60.0f)
             {
                 closeConnection(m_connections.at(i)->getClientId());
                 closeConnection(m_connections.at(i)->getServerId());

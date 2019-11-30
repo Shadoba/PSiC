@@ -7,7 +7,7 @@
 ProxyConnection::ProxyConnection(unsigned char * clientId, unsigned char * serverId, bool secure) : 
     m_clientId((char*)clientId, 5), m_serverId((char*)serverId, 5), m_secure(secure)
 {
-    m_timer = std::time();
+    m_timer = std::time(NULL);
 
     #if LOG_LEVEL == 1
         LOGGER << "New connection" << std::endl;
@@ -46,5 +46,5 @@ void ProxyConnection::setTime(const time_t newTime)
 
 void ProxyConnection::updateTimer()
 {
-    m_timer = std::time();
+    m_timer = std::time(NULL);
 }
