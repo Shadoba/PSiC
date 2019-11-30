@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <DatagramHandler.hpp>
+#include <Config.hpp>
 
 #define BUFFER_SIZE 8192
 #define ID_LENGTH 5
@@ -44,7 +45,10 @@ void ProxyServer::run()
 {
     while(true)
     {
+        //########################################################################
         //Up to 100 connections at a time - check on creation if vector is at 100?
+        //########################################################################
+        
         //Respond with 413 if the request from client is too large - above 8192 bytes
         //Close connections inactive for over 1 minute
 
@@ -67,7 +71,7 @@ void ProxyServer::run()
         //  Send message to the other party
 
         unsigned char buffer[BUFFER_SIZE];
-        int receiveStatus;
+        int status;
         std::stringstream dataStream;
 
         unsigned char id[ID_LENGTH];
@@ -87,111 +91,161 @@ void ProxyServer::run()
 
         //THIS IMPLEMENTATION ASSUMES SERVER RESPONSES ARE RECEIVED BY THE SAME SOCKET AS CLIENT REQUESTS - serverSocket.
 
-        //PROBLEM: How can you map incoming messages to their recipents, if one client can be connected to many servers, to the same one many times, and one server to many clients
-        //The entire thing below needs a rewrite because I didn't think of ^
-
-        for(unsigned int i = 0; i < m_connections.size(); i++)
+        unsigned int i = 0;
+        ProxyConnection *currentConnection;
+        for(; i < m_connections.size(); i++)
         {
-            if(!m_connections.at(i)->getClientId().compare(idString))                                  //Message from existing client
+            currentConnection = m_connections.at(i);
+            if(!currentConnection->getClientId().compare(idString))                                  //Message from existing client
             {
-                receiveStatus = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
-                if(receiveStatus < 0)
+                currentConnection->updateTimer();
+                status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
+                if(status < 0)
                 {
-                    handleError(receiveStatus);
+                    handleError(status);
+                    break;
                 }
-
-                if(receiveStatus > BUFFER_SIZE)
+                else if(status == 0)
                 {
-                    respondWith413(idString);
-                    closeConnection(idString);
+                    closeConnection(currentConnection->getServerId());
+                    dropConnection(i);
                     break;
                 }
 
-                dataStream.write((char*)buffer, receiveStatus);
-                
-                if(m_connections.at(i)->getSecure())
+                if(status > BUFFER_SIZE)
                 {
-                    sendMessage(m_connections.at(i)->getServerId(), dataStream.str());
+                    respondWith413(idString);
+                    break;
+                }
+
+                dataStream.write((char*)buffer, status);
+                
+                if(currentConnection->getSecure())
+                {
+                    sendMessage(currentConnection->getServerId(), dataStream.str());
                 }
                 else
                 {
                     dataStream.put('\0');
                     DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
-                    //modifyBody(datagramHandler);                                                  //This could be a method of DatagramHandler, so datagramHandler.modifyBody(), or it can do it  on its own
-                    sendMessage(m_connections.at(i)->getServerId(), datagramHandler.OutputDatagram);
+                    sendMessage(currentConnection->getServerId(), datagramHandler.OutputDatagram);
                 }
                 
                 break;
             }
-            else if(!m_connections.at(i)->getServerId().compare(idString))                             //Message from server
+            else if(!currentConnection->getServerId().compare(idString))                             //Message from server
             {
+                currentConnection->updateTimer();
                 do
                 {
                     zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                                     //Id frame
-                    receiveStatus = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
-                    if(receiveStatus < 0)
-                    {
-                        handleError(receiveStatus);
-                    }
-                    if(receiveStatus < BUFFER_SIZE)
-                        dataStream.write((char*)buffer, receiveStatus);
+                    status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
+                    if(status < 0)
+                        break;
+                    if(status < BUFFER_SIZE)
+                        dataStream.write((char*)buffer, status);
                     else
                         dataStream.write((char*)buffer, BUFFER_SIZE);
-                } while(receiveStatus > BUFFER_SIZE);
+                } while(status > BUFFER_SIZE);
 
-                sendMessage(m_connections.at(i)->getClientId(), dataStream.str());               //since we're only checking the body of clinet requests, this one can just be sent
-
-                break;
-            }
-            else                                                                                    //Since the ID isn't in connections, it's a new connection from a client
-            {
-                zmq_recv(m_serverSocket, buffer, 0, 0);                                             //To handle the empty "open connection" message
-                idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                              //Create a method bundling receive and error handling?
-                if(idStatus < 0)
+                if(status < 0)
                 {
-                    handleError(idStatus);
-                }
-                //compare IDs?
-
-                receiveStatus = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
-                if(receiveStatus < 0)
-                {
-                    handleError(receiveStatus);
-                }
-
-                if(receiveStatus > BUFFER_SIZE)
-                {
-                    respondWith413(idString);
-                    closeConnection(idString);
+                    handleError(status);
                     break;
+                }
+
+                if(dataStream.str().empty())
+                {
+                    closeConnection(currentConnection->getClientId());
+                    dropConnection(i);
+                    break;
+                }
+                
+                if(currentConnection->getSecure())
+                {
+                    sendMessage(currentConnection->getServerId(), dataStream.str());
                 }
                 else
                 {
-                    dataStream.write((char*)buffer, BUFFER_SIZE);
                     dataStream.put('\0');
                     DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
-
-                    //Extract server url, do name resolution, do zmq_connect
-                    //Create a ProxyConnection and add it to the vector
-                    //if(openConnection(url).size() > 0)
-                    //{
-                    //     //create connection and stuff
-                    //}
-                    //else
-                    //{
-                    //     respondWith502(idString);   //client ID
-                    //     closeConnection(idString);
-                    //}
-                    //if it's not a CONNECT modify body and send to server
+                    sendMessage(currentConnection->getServerId(), datagramHandler.OutputDatagram);
                 }
-                
+
                 break;
+            }
+        }
+
+        if(i == m_connections.size())                                                           //Id not in m_connections means new connection from client
+        {
+            zmq_recv(m_serverSocket, buffer, 0, 0);                                             //To handle the empty "open connection" message
+            //Handle what if this isn't empty??
+            idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                              //Create a method bundling receive and error handling?
+            if(idStatus < 0)
+            {
+                handleError(idStatus);
+                break;
+            }
+            //compare IDs?
+
+            status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
+            if(status < 0)
+            {
+                handleError(status);
+            }
+            else if(status > BUFFER_SIZE)
+            {
+                respondWith413(idString);
+                closeConnection(idString);
+            }
+            else
+            {
+                dataStream.write((char*)buffer, BUFFER_SIZE);
+                dataStream.put('\0');
+                DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
+                if(datagramHandler.Protocol == protocol::protocol::INVALID)
+                {
+                    respondWith501(idString);
+                    closeConnection(idString);
+                }
+                else
+                {
+                    std::string serverId = connectToServer(datagramHandler.Url);
+                    if(!serverId.empty())
+                    {
+                        if(datagramHandler.RequestMethod != httpRequest::httpRequestMethod::CONNECT)
+                        {
+                            m_connections.push_back(ProxyConnection(idString, serverId, false));
+                            sendMessage(serverId, dataStream.str());
+                        }
+                        else
+                        {
+                            m_connections.push_back(ProxyConnection(idString, serverId, true));
+                        }
+                    }
+                    else
+                    {
+                        respondWith502(idString);                                                   //client ID
+                        closeConnection(idString);
+                    }
+                }
+            }
+        }
+
+        for(unsigned int i = 0; i < m_connections.size(); i++)
+        {
+            if(difftime(m_connections.at(i)->getTimer(), std::time()) > 60.0f)
+            {
+                closeConnection(m_connections.at(i)->getClientId());
+                closeConnection(m_connections.at(i)->getServerId());
+                dropConnection(i);
+                i--;
             }
         }
     }
 }
 
-std::string ProxyServer::openConnection(std::string url)
+std::string ProxyServer::connectToServer(std::string url)
 {
     std::string address;
     int status;
@@ -199,6 +253,7 @@ std::string ProxyServer::openConnection(std::string url)
     status = getaddrinfo(NULL, url.c_str(), NULL, &result);
     if(status != 0)
         handleError(status);
+
     for(addrinfo *addressInfo = result; addressInfo != NULL; addressInfo = addressInfo->ai_next)
     {
         sockaddr_in *addrin = (sockaddr_in*)addressInfo->ai_addr;
@@ -234,12 +289,26 @@ void ProxyServer::closeConnection(std::string id)
     zmq_send(m_serverSocket, 0, 0, 0);
 }
 
+void ProxyServer::dropConnection(unsigned int i)
+{
+    m_connections.erase(m_connections.begin() + i);
+}
+
 void ProxyServer::respondWith413(std::string id)
 {
     std::string toSend = std::string("HTTP/1.1 413 Payload Too Large\r\n"
                                      "Content-Type: text/plain\r\n"
                                      "\r\n"
                                      "Payload Too Large");
+    sendMessage(id, toSend);
+}
+
+void ProxyServer::respondWith501(std::string id)
+{
+    std::string toSend = std::string("HTTP/1.1 501 Not Implemented\r\n"
+                                     "Content-Type: text/plain\r\n"
+                                     "\r\n"
+                                     "Not Implemented");
     sendMessage(id, toSend);
 }
 
@@ -254,6 +323,5 @@ void ProxyServer::respondWith502(std::string id)
 
 void ProxyServer::handleError(int status)
 {
-    std::cout << "Error during name resolution/establishing connection: " << zmq_strerror(zmq_errno()) << std::endl;
-    exit(1);
+    LOGGER << "Error during name resolution/establishing connection: " << zmq_strerror(zmq_errno()) << std::endl;
 }

@@ -22,12 +22,18 @@ public:
     const std::string & OutputDatagram;                 //<? Output datagram handle
     const httpRequest::httpRequestMethod & RequestMethod;//<? Request method handle
     const protocol::protocol & Protocol;                //<? Protocol handle
+    const std::string & Url;                            //<? url handle
 
 protected:
     const std::string m_InputDatagram;              //<? Input datagram
     std::string m_OutputDatagram;                   //<? Output datagram
     httpRequest::httpRequestMethod m_RequestMethod; //<? Request method
     protocol::protocol m_Protocol;                  //<? Protocol
+    std::string m_url                               //<? url handle
+
+private:
+    static int processDatagramBody(std::string & body);
+    static int processParsePrepare(std::string & body);
 };
 
 #endif /* __DATAGRAMHANDLER__ */
