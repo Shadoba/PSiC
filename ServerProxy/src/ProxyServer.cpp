@@ -114,6 +114,7 @@ void ProxyServer::run()
                 else
                 {
                     dataStream.write("\0");
+                    DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
                     //modifyBody(datagramHandler);                                                  //This could be a method of DatagramHandler, so datagramHandler.modifyBody(), or it can do it  on its own
                     sendMessage(m_connections.at(i)->getServerId(), datagramHandler.OutputDatagram);
                 }
@@ -212,7 +213,7 @@ std::string ProxyServer::openConnection(std::string url)
     status = zmq_getsockopt(m_serverSocket, ZMQ_ROUTING_ID, idBuffer, &intSize);
     if(status != 0)
         handleError(status);
-    return std::string(idBuffer, ID_LENGTH);
+    return std::string((char*)idBuffer, ID_LENGTH);
 }
 
 void ProxyServer::sendMessage(std::string id, std::string message)
@@ -233,7 +234,7 @@ void ProxyServer::respondWith413(std::string id)
                                      "Content-Type: text/plain\r\n"
                                      "\r\n"
                                      "Payload Too Large");
-    sendMessage(std::string id, toSend);
+    sendMessage(id, toSend);
 }
 
 void ProxyServer::respondWith502(std::string id)
@@ -242,7 +243,7 @@ void ProxyServer::respondWith502(std::string id)
                                      "Content-Type: text/plain\r\n"
                                      "\r\n"
                                      "Bad Gateway");
-    sendMessage(std::string id, toSend);
+    sendMessage(id, toSend);
 }
 
 void ProxyServer::handleError(int status)

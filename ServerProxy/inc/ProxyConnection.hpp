@@ -10,16 +10,16 @@ public:
     ProxyConnection(unsigned char * clientId, unsigned char * serverId, bool secure);
     ~ProxyConnection();
 
-    const std::basic_string <unsigned char> & getClientId() const;
+    const std::string & getClientId() const;
 
-    const std::basic_string <unsigned char> & getServerId() const;
+    const std::string & getServerId() const;
 
     const bool getSecure() const;
 
 
 protected:
-    const std::basic_string <unsigned char> m_clientId;
-    const std::basic_string <unsigned char> m_serverId;
+    const std::string m_clientId;
+    const std::string m_serverId;
     const bool m_secure;
 };
 

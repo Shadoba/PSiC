@@ -17,12 +17,12 @@ ProxyConnection::~ProxyConnection()
 
 }
 
-const std::basic_string<unsigned char> & ProxyConnection::getClientId() const
+const std::string & ProxyConnection::getClientId() const
 {
     return m_clientId;
 }
 
-const std::basic_string<unsigned char> & ProxyConnection::getServerId() const
+const std::string & ProxyConnection::getServerId() const
 {
     return m_serverId;
 }
