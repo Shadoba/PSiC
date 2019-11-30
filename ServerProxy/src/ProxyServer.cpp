@@ -66,7 +66,7 @@ void ProxyServer::run()
 
         unsigned char buffer[BUFFER_SIZE];
         int receiveStatus;
-        std::stringstream message;
+        std::stringstream dataStream;
 
         unsigned char id[ID_LENGTH];
         int idStatus;
@@ -90,7 +90,7 @@ void ProxyServer::run()
 
         for(unsigned int i = 0; i < m_connections.size(); i++)
         {
-            if(!m_connections.at(i).getClientId().compare(idString))                                  //Message from existing client
+            if(!m_connections.at(i)->getClientId().compare(idString))                                  //Message from existing client
             {
                 receiveStatus = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
                 if(receiveStatus < 0)
@@ -107,20 +107,20 @@ void ProxyServer::run()
 
                 dataStream.write((char*)buffer, receiveStatus);
                 
-                if(m_connections.at(i).getSecure())
+                if(m_connections.at(i)->getSecure())
                 {
-                    sendMessageToPeer(m_connections.at(i).getServerId(), dataStream.str());
+                    sendMessage(m_connections.at(i)->getServerId(), dataStream.str());
                 }
                 else
                 {
                     dataStream.write("\0");
                     //modifyBody(datagramHandler);                                                  //This could be a method of DatagramHandler, so datagramHandler.modifyBody(), or it can do it  on its own
-                    sendMessageToPeer(m_connections.at(i).getServerId(), datagramHandler.OutputDatagram);
+                    sendMessage(m_connections.at(i)->getServerId(), datagramHandler.OutputDatagram);
                 }
                 
                 break;
             }
-            else if(!m_connections.at(i).getServerId().compare(idString))                             //Message from server
+            else if(!m_connections.at(i)->getServerId().compare(idString))                             //Message from server
             {
                 do
                 {
@@ -136,7 +136,7 @@ void ProxyServer::run()
                         dataStream.write((char*)buffer, BUFFER_SIZE);
                 } while(receiveStatus > BUFFER_SIZE);
 
-                sendMessageToPeer(m_connections.at(i).getClientId(), dataStream.str());               //since we're only checking the body of clinet requests, this one can just be sent
+                sendMessage(m_connections.at(i)->getClientId(), dataStream.str());               //since we're only checking the body of clinet requests, this one can just be sent
 
                 break;
             }
@@ -164,9 +164,9 @@ void ProxyServer::run()
                 }
                 else
                 {
-                    message.write((char*)buffer, BUFFER_SIZE);
-                    message.write("\0");
-                    DatagramHandler datagramHandler = DatagramHandler(message.str());
+                    dataStream.write((char*)buffer, BUFFER_SIZE);
+                    dataStream.write("\0");
+                    DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
 
                     //Extract server url, do name resolution, do zmq_connect
                     //Create a ProxyConnection and add it to the vector
