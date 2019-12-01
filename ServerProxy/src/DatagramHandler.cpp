@@ -102,7 +102,7 @@ int DatagramHandler::processDatagramBody(std::string & body)
         {
             /* 26 number characters are not reached --> keep trying      */
             numPosAbsolute += numPos + charCounter;
-            bodyTmp = bodyTmp.substr(numPosAbsolute);
+            bodyTmp = bodyTmp.substr(charCounter);
         }
     }
 
