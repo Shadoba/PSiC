@@ -14,10 +14,12 @@ public:
     void run();
 
 private:
-    std::string openConnection(std::string url);
+    std::string connectToServer(std::string url);
     void sendMessage(std::string id, std::string message);
     void closeConnection(std::string id);
+    void dropConnection(unsigned int i);
     void respondWith413(std::string id);
+    void respondWith501(std::string id);
     void respondWith502(std::string id);
     void handleError(int status);
 

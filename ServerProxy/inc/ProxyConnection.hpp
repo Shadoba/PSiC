@@ -2,6 +2,8 @@
 #define __PROXYCONNECTION__
 
 #include <string>
+#include <time.h>
+#include <ctime>
 
 /**
  * @brief Class ProxyConnection stores data on 
@@ -10,7 +12,7 @@
 class ProxyConnection
 {
 public:
-    ProxyConnection(unsigned char * clientId, unsigned char * serverId, bool secure);
+    ProxyConnection(std::string clientId, std::string serverId, bool secure);
     ~ProxyConnection();
 
     /**
@@ -35,9 +37,30 @@ public:
      */
     const bool getSecure() const;
 
-    const std::basic_string <unsigned char> m_clientId; //<? id of seed
-    const std::basic_string <unsigned char> m_serverId; //<? id of peer
-    const bool m_secure;                                //<? determines encryption
+    /**
+     * @brief Get the Timer object
+     * 
+     * @return time_t of timer
+     */
+    const time_t getTimer() const;
+
+    /**
+     * @brief Sets the Timer Object
+     * 
+     * @param newTime time_t new value of Timer
+     */
+    void setTime(const time_t newTime);
+
+    /**
+     * @brief Updates the Timer object to current moment
+     */
+    void updateTimer();
+
+private:
+    const std::string m_clientId; //<? id of seed
+    const std::string m_serverId; //<? id of peer
+    const bool m_secure;          //<? determines encryption
+    time_t m_timer;
 };
 
 #endif /* __PROXYCONNECTION__ */
