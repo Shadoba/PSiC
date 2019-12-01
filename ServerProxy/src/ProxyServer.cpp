@@ -259,7 +259,9 @@ std::string ProxyServer::connectToServer(std::string url)
         sockaddr_in *addrin = (sockaddr_in*)addressInfo->ai_addr;
         address = std::string("tcp://") + std::string(inet_ntoa(addrin->sin_addr));
         address.append("\0");
-        std::cout << address << std::endl;
+        #if LOG_LEVEL > 5
+            std::cout << address << std::endl;
+        #endif
         status = zmq_connect(m_serverSocket, address.c_str());
         if(status == 0)
             break;
@@ -323,5 +325,5 @@ void ProxyServer::respondWith502(std::string id)
 
 void ProxyServer::handleError(int status)
 {
-    LOGGER << "Error during name resolution/establishing connection: " << zmq_strerror(zmq_errno()) << std::endl;
+    LOGGER << "Error: " << zmq_strerror(zmq_errno()) << std::endl;
 }
