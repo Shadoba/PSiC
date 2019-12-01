@@ -27,6 +27,7 @@ public:
 protected:
     const std::string m_InputDatagram;              //<? Input datagram
     std::string m_OutputDatagram;                   //<? Output datagram
+
     httpRequest::httpRequestMethod m_RequestMethod; //<? Request method
     protocol::protocol m_Protocol;                  //<? Protocol
     std::string m_url;                              //<? url handle
