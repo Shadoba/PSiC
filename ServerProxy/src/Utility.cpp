@@ -51,6 +51,15 @@ std::vector<std::string> Utility::splitStringOnce(const std::string input, const
     return result;
 }
 
+std::string Utility::extractDomainName(std::string input)
+{
+    size_t start = 0, stop = 0;
+    if(input.at(0) != 'w')
+        start = input.find('w');
+    stop = input.find('/', start);
+    return input.substr(start, stop - start);
+}
+
 httpRequest::httpRequestMethod Utility::getMethodByString(const std::string input)
 {
     if(!input.compare("CONNECT"))
