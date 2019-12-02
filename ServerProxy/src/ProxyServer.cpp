@@ -125,15 +125,20 @@ void ProxyServer::run()
                 }
 
                 dataStream.write((char*)buffer, status);
-                
+                dataStream.put('\0');
+                std::string data = dataStream.str();
+
+                #if LOG_LEVEL > 5
+                    LOGGER << "Data size " << status << ", content\n" << data << std::endl;
+                #endif
+
                 if(currentConnection->getSecure())
                 {
-                    sendMessage(currentConnection->getServerId(), dataStream.str());
+                    sendMessage(currentConnection->getServerId(), data);
                 }
                 else
                 {
-                    dataStream.put('\0');
-                    DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
+                    DatagramHandler datagramHandler = DatagramHandler(data);
                     sendMessage(currentConnection->getServerId(), datagramHandler.OutputDatagram);
                 }
                 
