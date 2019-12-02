@@ -314,8 +314,13 @@ std::string ProxyServer::connectToServer(std::string url)
 
 void ProxyServer::sendMessage(std::string id, std::string message)
 {
-    zmq_send(m_serverSocket, id.c_str(), id.size(), ZMQ_SNDMORE);
-    zmq_send(m_serverSocket, message.c_str(), message.size(), 0);
+    int status;
+    status = zmq_send(m_serverSocket, id.c_str(), id.size(), ZMQ_SNDMORE);
+    if(status < 0)
+        handleError(status);
+    status = zmq_send(m_serverSocket, message.c_str(), message.size(), 0);
+    if(status < 0)
+        handleError(status);
 }
 
 void ProxyServer::closeConnection(std::string id)
