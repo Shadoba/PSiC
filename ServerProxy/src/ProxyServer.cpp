@@ -278,22 +278,22 @@ std::string ProxyServer::connectToServer(std::string url)
         sockaddr_in *addrin = (sockaddr_in*)addressInfo->ai_addr;
         address = std::string("tcp://") + std::string(inet_ntoa(addrin->sin_addr));
         address.append("\0");
-        #if LOG_LEVEL > 5
-            LOGGER << "Resolved server address " << address << std::endl;
-        #endif
         status = zmq_connect(m_serverSocket, address.c_str());
         if(status == 0)
             break;
     }
 
     freeaddrinfo(result);
-    if(status != 0)
+    if(status < 0)
         return std::string();
 
+    #if LOG_LEVEL > 5
+        LOGGER << "Resolved server address " << address << std::endl;
+    #endif
     unsigned char idBuffer[ID_LENGTH];
     size_t intSize = ID_LENGTH;
     status = zmq_getsockopt(m_serverSocket, ZMQ_ROUTING_ID, idBuffer, &intSize);
-    if(status != 0)
+    if(status < 0)
         handleError(status);
     return std::string((char*)idBuffer, ID_LENGTH);
 }
