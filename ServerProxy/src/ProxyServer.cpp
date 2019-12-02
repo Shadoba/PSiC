@@ -88,6 +88,9 @@ void ProxyServer::run()
             }
         }
         std::string idString = std::string((char*)id, ID_LENGTH);
+        #if LOG_LEVEL > 5
+            LOGGER << "Received message at " << idString << std::endl;
+        #endif
 
         unsigned int i = 0;
         ProxyConnection *currentConnection;
