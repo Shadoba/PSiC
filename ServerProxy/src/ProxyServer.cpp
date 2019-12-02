@@ -280,8 +280,8 @@ std::string ProxyServer::connectToServer(std::string url)
     for(addrinfo *addressInfo = result; addressInfo != NULL; addressInfo = addressInfo->ai_next)
     {
         sockaddr_in *addrin = (sockaddr_in*)addressInfo->ai_addr;
-        address = std::string("tcp://") + std::string(inet_ntoa(addrin->sin_addr)) + std::string(":*");
-        address.append("\0");
+        address = std::string("tcp://") + std::string(inet_ntoa(addrin->sin_addr));
+        //address.append("\0");
         #if LOG_LEVEL > 5
             LOGGER << "Resolved server address " << address << std::endl;
         #endif
