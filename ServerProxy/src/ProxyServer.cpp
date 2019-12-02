@@ -269,7 +269,7 @@ std::string ProxyServer::connectToServer(std::string url)
     std::string address;
     int status;
     addrinfo *result;
-    status = getaddrinfo(Utility::extractDomainName(url).c_str(), "8080", NULL, &result);
+    status = getaddrinfo(Utility::extractDomainName(url).c_str(), NULL, NULL, &result);
     if(status < 0)
         handleError(status);
 
