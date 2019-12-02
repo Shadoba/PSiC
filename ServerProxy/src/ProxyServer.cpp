@@ -194,7 +194,12 @@ void ProxyServer::run()
             #if LOG_LEVEL > 5
                 LOGGER << "Received new connection " << idString << std::endl;
             #endif
-            zmq_recv(m_serverSocket, buffer, 0, 0);                                             //To handle the empty "open connection" message
+            status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);                                             //To handle the empty "open connection" message
+            if(status != 0)
+            {
+                LOGGER << "Received data where there should be none!" << std::endl;
+                exit(1);
+            }
             //Handle what if this isn't empty??
             idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                              //Create a method bundling receive and error handling?
             if(idStatus < 0)
@@ -202,7 +207,11 @@ void ProxyServer::run()
                 handleError(idStatus);
                 break;
             }
-            //compare IDs?
+            if(!std::string(id, ID_LENGTH).compare(idString))
+            {
+                LOGGER << "Id mismatch!" << std::endl;
+                exit(1);
+            }
 
             status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
             if(status < 0)
