@@ -207,7 +207,7 @@ void ProxyServer::run()
                 handleError(idStatus);
                 break;
             }
-            if(!std::string(id, ID_LENGTH).compare(idString))
+            if(!std::string((char*)id, ID_LENGTH).compare(idString))
             {
                 LOGGER << "Id mismatch!" << std::endl;
                 exit(1);
