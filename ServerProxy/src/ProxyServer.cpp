@@ -282,6 +282,9 @@ std::string ProxyServer::connectToServer(std::string url)
         sockaddr_in *addrin = (sockaddr_in*)addressInfo->ai_addr;
         address = std::string(inet_ntoa(addrin->sin_addr));
         address.append("\0");
+        #if LOG_LEVEL > 5
+            LOGGER << "Resolved server address " << address << std::endl;
+        #endif
         status = zmq_connect(m_serverSocket, address.c_str());
         if(status == 0)
             break;
@@ -292,7 +295,7 @@ std::string ProxyServer::connectToServer(std::string url)
         return std::string();
 
     #if LOG_LEVEL > 5
-        LOGGER << "Resolved server address " << address << std::endl;
+        LOGGER << "Used server address " << address << std::endl;
     #endif
     unsigned char idBuffer[ID_LENGTH];
     size_t intSize = ID_LENGTH;
