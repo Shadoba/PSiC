@@ -45,6 +45,17 @@ void ProxyServer::run()
 {
     while(true)
     {
+        for(unsigned int i = 0; i < m_connections.size(); i++)
+        {
+            if(difftime(m_connections.at(i)->getTimer(), std::time(NULL)) > 60.0f)
+            {
+                closeConnection(m_connections.at(i)->getClientId());
+                closeConnection(m_connections.at(i)->getServerId());
+                dropConnection(i);
+                i--;
+            }
+        }
+        
         //########################################################################
         //Up to 100 connections at a time - check on creation if vector is at 100?
         //########################################################################
@@ -272,16 +283,6 @@ void ProxyServer::run()
             }
         }
 
-        for(unsigned int i = 0; i < m_connections.size(); i++)
-        {
-            if(difftime(m_connections.at(i)->getTimer(), std::time(NULL)) > 60.0f)
-            {
-                closeConnection(m_connections.at(i)->getClientId());
-                closeConnection(m_connections.at(i)->getServerId());
-                dropConnection(i);
-                i--;
-            }
-        }
     }
 }
 
