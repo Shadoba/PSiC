@@ -363,5 +363,5 @@ void ProxyServer::handleError(int status)
     if(zmq_errno() != 0)
         LOGGER << "Error: " << zmq_strerror(zmq_errno()) << std::endl;
     else
-        LOGGER << "Error: " << gai_strerror() << std::endl;
+        LOGGER << "Error: " << gai_strerror(errno) << std::endl;
 }
