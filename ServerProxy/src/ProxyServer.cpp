@@ -360,5 +360,8 @@ void ProxyServer::respondWith502(std::string id)
 
 void ProxyServer::handleError(int status)
 {
-    LOGGER << "Error: " << zmq_strerror(zmq_errno()) << std::endl;
+    if(zmq_errno() != 0)
+        LOGGER << "Error: " << zmq_strerror(zmq_errno()) << std::endl;
+    else
+        LOGGER << "Error: " << gai_strerror() << std::endl;
 }
