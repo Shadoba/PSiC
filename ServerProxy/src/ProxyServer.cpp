@@ -269,11 +269,16 @@ std::string ProxyServer::connectToServer(std::string url)
     std::string address;
     int status;
     addrinfo *result;
+    addrinfo hints;
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = 0;
+    hints.ai_flags = 0;
     std::string extractedUrl = Utility::extractDomainName(url);
     #if LOG_LEVEL > 5
         LOGGER << "Extracted URL " << extractedUrl << std::endl;
     #endif
-    status = getaddrinfo(extractedUrl.c_str(), NULL, NULL, &result);
+    status = getaddrinfo(extractedUrl.c_str(), NULL, &hints, &result);
     if(status < 0)
         handleError(status);
 
