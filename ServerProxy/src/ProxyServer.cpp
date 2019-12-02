@@ -269,8 +269,8 @@ std::string ProxyServer::connectToServer(std::string url)
     std::string address;
     int status;
     addrinfo *result;
-    status = getaddrinfo(NULL, url.c_str(), NULL, &result);
-    if(status != 0)
+    status = getaddrinfo(url.c_str(), NULL, NULL, &result);
+    if(status < 0)
         handleError(status);
 
     for(addrinfo *addressInfo = result; addressInfo != NULL; addressInfo = addressInfo->ai_next)
@@ -293,8 +293,8 @@ std::string ProxyServer::connectToServer(std::string url)
     unsigned char idBuffer[ID_LENGTH];
     size_t intSize = ID_LENGTH;
     status = zmq_getsockopt(m_serverSocket, ZMQ_ROUTING_ID, idBuffer, &intSize);
-    //if(status < 0)
-    //    handleError(status);
+    if(status < 0)
+        handleError(status);
     return std::string((char*)idBuffer, ID_LENGTH);
 }
 
