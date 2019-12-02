@@ -107,7 +107,6 @@ void ProxyServer::run()
                 if(status < 0)
                 {
                     handleError(status);
-                    break;
                 }
                 else if(status == 0)
                 {
@@ -161,7 +160,6 @@ void ProxyServer::run()
                 if(status < 0)
                 {
                     handleError(status);
-                    break;
                 }
 
                 if(dataStream.str().empty())
@@ -205,7 +203,6 @@ void ProxyServer::run()
             if(idStatus < 0)
             {
                 handleError(idStatus);
-                break;
             }
             std::string newIdString = std::string((char*)id);
             if(!newIdString.compare(idString))
@@ -247,11 +244,17 @@ void ProxyServer::run()
                         #endif
                         if(datagramHandler.RequestMethod != httpRequest::httpRequestMethod::CONNECT)
                         {
+                            #if LOG_LEVEL > 5
+                                LOGGER << "Request method insecure, sending to server" << std::endl;
+                            #endif
                             m_connections.push_back(new ProxyConnection(idString, serverId, false));
                             sendMessage(serverId, dataStream.str());
                         }
                         else
                         {
+                            #if LOG_LEVEL > 5
+                                LOGGER << "Request method secure, sending to server" << std::endl;
+                            #endif
                             m_connections.push_back(new ProxyConnection(idString, serverId, true));
                         }
                     }
@@ -393,4 +396,5 @@ void ProxyServer::handleError(int status)
         LOGGER << "Error: " << zmq_strerror(zmq_errno()) << std::endl;
     else
         LOGGER << "Error: " << gai_strerror(errno) << std::endl;
+    exit(1);
 }
