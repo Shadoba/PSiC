@@ -28,7 +28,7 @@ ProxyServer::ProxyServer(const std::string str)
     int bindStatus = zmq_bind(m_serverSocket, str.c_str());
     if(bindStatus < 0)
     {
-        std::cout << "Bind error: " << zmq_strerror(zmq_errno()) << std::endl;
+        LOGGER << "Bind error: " << zmq_strerror(zmq_errno()) << std::endl;
         exit(1);
     }
 }
@@ -89,8 +89,6 @@ void ProxyServer::run()
         }
         std::string idString = std::string((char*)id, ID_LENGTH);
 
-        //THIS IMPLEMENTATION ASSUMES SERVER RESPONSES ARE RECEIVED BY THE SAME SOCKET AS CLIENT REQUESTS - serverSocket.
-
         unsigned int i = 0;
         ProxyConnection *currentConnection;
         for(; i < m_connections.size(); i++)
@@ -98,6 +96,9 @@ void ProxyServer::run()
             currentConnection = m_connections.at(i);
             if(!currentConnection->getClientId().compare(idString))                                  //Message from existing client
             {
+                #if LOG_LEVEL > 5
+                    LOGGER << "Received message from client " << currentConnection->getClientId() << std::endl;
+                #endif
                 currentConnection->updateTimer();
                 status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
                 if(status < 0)
@@ -107,6 +108,9 @@ void ProxyServer::run()
                 }
                 else if(status == 0)
                 {
+                    #if LOG_LEVEL > 5
+                        LOGGER << "Connection closed from " << idString << std::endl;
+                    #endif
                     closeConnection(currentConnection->getServerId());
                     dropConnection(i);
                     break;
@@ -135,10 +139,13 @@ void ProxyServer::run()
             }
             else if(!currentConnection->getServerId().compare(idString))                             //Message from server
             {
+                #if LOG_LEVEL > 5
+                    LOGGER << "Received message from server " << currentConnection->getServerId() << std::endl;
+                #endif
                 currentConnection->updateTimer();
                 do
                 {
-                    zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                                     //Id frame
+                    zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                                      //Id frame
                     status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
                     if(status < 0)
                         break;
@@ -156,6 +163,9 @@ void ProxyServer::run()
 
                 if(dataStream.str().empty())
                 {
+                    #if LOG_LEVEL > 5
+                        LOGGER << "Closed connection from " << idString << std::endl;
+                    #endif
                     closeConnection(currentConnection->getClientId());
                     dropConnection(i);
                     break;
@@ -178,6 +188,9 @@ void ProxyServer::run()
 
         if(i == m_connections.size())                                                           //Id not in m_connections means new connection from client
         {
+            #if LOG_LEVEL > 5
+                LOGGER << "Received new connection " << idString << std::endl;
+            #endif
             zmq_recv(m_serverSocket, buffer, 0, 0);                                             //To handle the empty "open connection" message
             //Handle what if this isn't empty??
             idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                              //Create a method bundling receive and error handling?
@@ -210,9 +223,15 @@ void ProxyServer::run()
                 }
                 else
                 {
+                    #if LOG_LEVEL > 5
+                        LOGGER << "Attempting to connect to server at " << datagramHandler.Url << std::endl;
+                    #endif
                     std::string serverId = connectToServer(datagramHandler.Url);
                     if(!serverId.empty())
                     {
+                        #if LOG_LEVEL > 5
+                            LOGGER << "Connection established between " << idString << " and " << serverId << std::endl;
+                        #endif
                         if(datagramHandler.RequestMethod != httpRequest::httpRequestMethod::CONNECT)
                         {
                             m_connections.push_back(new ProxyConnection(idString, serverId, false));
@@ -260,7 +279,7 @@ std::string ProxyServer::connectToServer(std::string url)
         address = std::string("tcp://") + std::string(inet_ntoa(addrin->sin_addr));
         address.append("\0");
         #if LOG_LEVEL > 5
-            std::cout << address << std::endl;
+            LOGGER << "Resolved server address " << address << std::endl;
         #endif
         status = zmq_connect(m_serverSocket, address.c_str());
         if(status == 0)
@@ -287,17 +306,27 @@ void ProxyServer::sendMessage(std::string id, std::string message)
 
 void ProxyServer::closeConnection(std::string id)
 {
+    #if LOG_LEVEL > 5
+        LOGGER << "Closing connection to " << id << std::endl;
+    #endif
     zmq_send(m_serverSocket, id.c_str(), ID_LENGTH, ZMQ_SNDMORE);
     zmq_send(m_serverSocket, 0, 0, 0);
 }
 
 void ProxyServer::dropConnection(unsigned int i)
 {
+    #if LOG_LEVEL > 5
+        LOGGER << "Dropping connection from " << m_connections.at(i)->getClientId() << " to " << m_connections.at(i)->getServerId() << std::endl;
+    #endif
     m_connections.erase(m_connections.begin() + i);
 }
 
+//Those responses could be handled by a map?
 void ProxyServer::respondWith413(std::string id)
 {
+    #if LOG_LEVEL > 5
+        LOGGER << "Payload too large!" << std::endl;
+    #endif
     std::string toSend = std::string("HTTP/1.1 413 Payload Too Large\r\n"
                                      "Content-Type: text/plain\r\n"
                                      "\r\n"
@@ -307,6 +336,9 @@ void ProxyServer::respondWith413(std::string id)
 
 void ProxyServer::respondWith501(std::string id)
 {
+    #if LOG_LEVEL > 5
+        LOGGER << "Invalid protocol!" << std::endl;
+    #endif
     std::string toSend = std::string("HTTP/1.1 501 Not Implemented\r\n"
                                      "Content-Type: text/plain\r\n"
                                      "\r\n"
@@ -316,6 +348,9 @@ void ProxyServer::respondWith501(std::string id)
 
 void ProxyServer::respondWith502(std::string id)
 {
+    #if LOG_LEVEL > 5
+        LOGGER << "Unable to connect to server!" << std::endl;
+    #endif
     std::string toSend = std::string("HTTP/1.1 502 Bad Gateway\r\n"
                                      "Content-Type: text/plain\r\n"
                                      "\r\n"
