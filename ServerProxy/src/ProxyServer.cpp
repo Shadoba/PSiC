@@ -329,7 +329,14 @@ std::string ProxyServer::connectToServer(std::string url)
         handleError(status);
         exit(1);
     }
-    LOGGER << "EXTRA READ\n" << std::string((char*)buffer, status);
+    LOGGER << "EXTRA READ " << status << "\n" << std::string((char*)buffer, status);
+    status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
+    if(status < 0)
+    {
+        handleError(status);
+        exit(1);
+    }
+    LOGGER << "EXTRA READ " << status << "\n" << std::string((char*)buffer, status);
     //####################################
 
     return std::string((char*)idBuffer, ID_LENGTH);
