@@ -17,7 +17,7 @@ DatagramHandler::DatagramHandler(const std::string & datagram) :
     const char * const headerEnd = "\r\n\r\n";
     std::vector<std::string> splitDatagram = Utility::splitStringOnce(m_InputDatagram, headerEnd);
     #if LOG_LEVEL > 5
-    LOGGER << "Header split into: " << splitDatagram.size() << std::endl;
+        LOGGER << "Header split into: " << splitDatagram.size() << std::endl;
     #endif
     SERVER_ASSERT_MSG(2 != splitDatagram.size(), "splitStringOnce() more than one split")
 
@@ -33,8 +33,8 @@ DatagramHandler::DatagramHandler(const std::string & datagram) :
     m_Protocol = headerProcessor.getProtocolEnum();
     m_url = headerProcessor.Url;
 
-    if(httpRequest::CONNECT != m_RequestMethod)
-        int result = processDatagramBody(body);
+    //if(httpRequest::CONNECT != m_RequestMethod)
+        //int result = processDatagramBody(body);
 
     m_OutputDatagram = headerProcessor.OutputHeader;
     m_OutputDatagram += headerEnd;
