@@ -50,12 +50,13 @@ int DatagramHandler::processDatagramBody(std::string & body)
     int numPos = 0;
     int numPosAbsolute = 0;
     int numPosArray[26];
+    int numberCounter = 0;
     //bodyTmp.erase(std::remove(bodyTmp.begin(), bodyTmp.end(), ' '), bodyTmp.end());
     /* check for every number character if there is */
     /* a stream of 26 numbers in row                */
     while(numPos = bodyTmp.find_first_of("0123456789"))
     {
-        int numberCounter = 0;
+        numberCounter = 0;
         int charCounter = 0;
         int isCharacterANumber = 0;
         /* check every character after the first one was        */
@@ -72,7 +73,7 @@ int DatagramHandler::processDatagramBody(std::string & body)
 
             /* if character is number indeed then save its relative */
             /* position from the string and add number storage      */
-            if(isCharacterANumber && (26 >= numberCounter))
+            if(isCharacterANumber && (26 > numberCounter))
             {
                 numPosArray[numberCounter] = numPos + charCounter - 1;
                 numberCounter++;
@@ -88,7 +89,7 @@ int DatagramHandler::processDatagramBody(std::string & body)
         } while (std::string::npos != charCounter);
 
         /* determine if required 26 digit character are present */
-        if(26 <= numberCounter)
+        if(26 >= numberCounter)
         {
             /* 26 number characters are reached --> success             */
             /* Align number characters position to parameter string body*/
@@ -107,12 +108,16 @@ int DatagramHandler::processDatagramBody(std::string & body)
     }
 
     int result = 0;
-    /* reached end of string and no number stream was detected */
-    if(!bodyTmp.empty())
+    /* reached end of string */
+    if(!bodyTmp.empty() && (0 != numberCounter))
     {
+        /* string is parsed and 26 numbers in it was deetected  */
+        /* calculate gathered number                            */
         result = calculate(numberStorage);
         if(1 == result)
         {
+            /* exchange found numbers in        */
+            /* the string to user defined ones  */
             for(int i = 0; i < 26; i++)
             {
                 body[numPosArray[i]] = '1';
