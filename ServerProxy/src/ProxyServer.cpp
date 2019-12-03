@@ -173,10 +173,16 @@ void ProxyServer::run()
                 
                 if(currentConnection->getSecure())
                 {
+                    #if LOG_LEVEL > 5
+                        LOGGER << "Connection secure" << std::endl;
+                    #endif
                     sendMessage(currentConnection->getServerId(), dataString);
                 }
                 else
                 {
+                    #if LOG_LEVEL > 5
+                        LOGGER << "Connection insecure, modifying body" << std::endl;
+                    #endif
                     DatagramHandler datagramHandler = DatagramHandler(dataString);
                     sendMessage(currentConnection->getServerId(), datagramHandler.OutputDatagram);
                 }
