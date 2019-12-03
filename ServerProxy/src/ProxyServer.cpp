@@ -139,7 +139,14 @@ void ProxyServer::run()
                     else
                         dataStream.write((char*)buffer, BUFFER_SIZE);
                     if(status > BUFFER_SIZE)
+                    {
                         zmq_recv(m_serverSocket, id, ID_LENGTH, 0);
+                        if(!std::string((char*)id, ID_LENGTH).compare(idString))
+                        {
+                            LOGGER << "Id mismatch in receive from server do-while" << std::endl;
+                            exit(1);
+                        }
+                    }
                 } while(status > BUFFER_SIZE);
 
                 if(status < 0)
@@ -147,7 +154,14 @@ void ProxyServer::run()
                     handleError(status);
                 }
 
-                if(dataStream.str().empty())
+                dataStream.put('\0');
+                std::string dataString = dataStream.str();
+
+                #if LOG_LEVEL > 5
+                    LOGGER << dataString << std::endl;
+                #endif
+
+                if(dataString.empty())
                 {
                     #if LOG_LEVEL > 5
                         LOGGER << "Closed connection from " << idString << std::endl;
@@ -159,12 +173,11 @@ void ProxyServer::run()
                 
                 if(currentConnection->getSecure())
                 {
-                    sendMessage(currentConnection->getServerId(), dataStream.str());
+                    sendMessage(currentConnection->getServerId(), dataString);
                 }
                 else
                 {
-                    dataStream.put('\0');
-                    DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
+                    DatagramHandler datagramHandler = DatagramHandler(dataString);
                     sendMessage(currentConnection->getServerId(), datagramHandler.OutputDatagram);
                 }
 
