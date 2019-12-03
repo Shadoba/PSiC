@@ -310,13 +310,13 @@ std::string ProxyServer::connectToServer(std::string url)
     //*/
     /*
     address = std::string("tcp://") + url.substr(7, 15);
+    */
     status = zmq_connect(m_serverSocket, address.c_str());
     #if LOG_LEVEL > 5
         LOGGER << "Used server address " << address << std::endl;
     #endif
     if(status < 0)
         return std::string();
-    */
     unsigned char idBuffer[ID_LENGTH];
     size_t intSize = ID_LENGTH;
     status = zmq_getsockopt(m_serverSocket, ZMQ_ROUTING_ID, idBuffer, &intSize);
