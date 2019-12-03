@@ -300,6 +300,9 @@ std::string ProxyServer::connectToServer(std::string url)
 
 void ProxyServer::sendMessage(std::string id, std::string message)
 {
+    #if LOG_LEVEL > 5
+        LOGGER << "Sending message to " << id << std::endl;
+    #endif
     int status;
     status = zmq_send(m_serverSocket, id.c_str(), id.size(), ZMQ_SNDMORE);
     if(status < 0)
