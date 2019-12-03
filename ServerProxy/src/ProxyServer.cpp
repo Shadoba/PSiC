@@ -266,7 +266,6 @@ std::string ProxyServer::connectToServer(std::string url)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = 0;
     hints.ai_flags = 0;
-    if(url)
     /*
     std::string extractedUrl = Utility::extractDomainName(url);
     #if LOG_LEVEL > 5
