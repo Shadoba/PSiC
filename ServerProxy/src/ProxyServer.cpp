@@ -329,7 +329,7 @@ std::string ProxyServer::connectToServer(std::string url)
         handleError(status);
         exit(1);
     }
-    LOGGER << std::string((char*)buffer, status);
+    LOGGER << "EXTRA READ\n" << std::string((char*)buffer, status);
     //####################################
 
     return std::string((char*)idBuffer, ID_LENGTH);
