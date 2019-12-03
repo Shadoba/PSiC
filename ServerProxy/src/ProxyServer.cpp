@@ -131,7 +131,6 @@ void ProxyServer::run()
                 currentConnection->updateTimer();
                 do
                 {
-                    zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                                      //Id frame
                     status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
                     if(status < 0)
                         break;
@@ -139,6 +138,8 @@ void ProxyServer::run()
                         dataStream.write((char*)buffer, status);
                     else
                         dataStream.write((char*)buffer, BUFFER_SIZE);
+                    if(status > BUFFER_SIZE)
+                        zmq_recv(m_serverSocket, id, ID_LENGTH, 0);
                 } while(status > BUFFER_SIZE);
 
                 if(status < 0)
