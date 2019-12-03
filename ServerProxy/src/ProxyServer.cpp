@@ -197,7 +197,7 @@ void ProxyServer::run()
             if(status != 0)
             {
                 LOGGER << "Received data where there should be none!" << std::endl;
-                LOGGER << std::string(buffer, status) << std::endl;
+                LOGGER << std::string((char*)buffer, status) << std::endl;
                 exit(1);
             }
             //Handle what if this isn't empty??
