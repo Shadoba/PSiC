@@ -27,9 +27,9 @@ ProxyServer::ProxyServer(const std::string str)
     }
     
     //###############################################################
-    int value = 0;
-    size_t size = sizeof(value);
-    zmq_setsockopt(m_serverSocket, ZMQ_STREAM_NOTIFY, &value, size);
+    // int value = 0;
+    // size_t size = sizeof(value);
+    // zmq_setsockopt(m_serverSocket, ZMQ_STREAM_NOTIFY, &value, size);
     //###############################################################
 }
 
@@ -195,24 +195,24 @@ void ProxyServer::run()
             #if LOG_LEVEL > 5
                 LOGGER << "Received new connection " << idString << std::endl;
             #endif
-            // status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);                                             //To handle the empty "open connection" message
-            // if(status != 0)
-            // {
-            //     LOGGER << "Received data where there should be none!" << std::endl;
-            //     LOGGER << std::string((char*)buffer, status) << std::endl;
-            //     exit(1);
-            // }
-            // idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, 0);
-            // if(idStatus < 0)
-            // {
-            //     handleError(idStatus);
-            // }
-            // std::string newIdString = std::string((char*)id);
-            // if(!newIdString.compare(idString))
-            // {
-            //     LOGGER << "Id mismatch! " << idString << " and " << newIdString << std::endl;
-            //     exit(1);
-            // }
+            status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);                                             //To handle the empty "open connection" message
+            if(status != 0)
+            {
+                LOGGER << "Received data where there should be none!" << std::endl;
+                LOGGER << std::string((char*)buffer, status) << std::endl;
+                exit(1);
+            }
+            idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, 0);
+            if(idStatus < 0)
+            {
+                handleError(idStatus);
+            }
+            std::string newIdString = std::string((char*)id);
+            if(!newIdString.compare(idString))
+            {
+                LOGGER << "Id mismatch! " << idString << " and " << newIdString << std::endl;
+                exit(1);
+            }
 
             status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
             if(status < 0)
@@ -326,6 +326,15 @@ std::string ProxyServer::connectToServer(std::string url)
         handleError(status);
     #if LOG_LEVEL > 5
         LOGGER << "Resolved id " << std::string((char*)idBuffer, ID_LENGTH) << std::endl;
+    #endif
+
+    zmq_recv(m_serverSocket, 0, 0, 0);
+    #if LOG_LEVEL > 5
+        LOGGER << "Extra recv 1" << std::endl;
+    #endif
+    zmq_recv(m_serverSocket, 0, 0, 0);
+    #if LOG_LEVEL > 5
+        LOGGER << "Extra recv 2" << std::endl;
     #endif
 
     return std::string((char*)idBuffer, ID_LENGTH);
