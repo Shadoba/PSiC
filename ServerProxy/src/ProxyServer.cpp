@@ -322,23 +322,26 @@ std::string ProxyServer::connectToServer(std::string url)
     status = zmq_getsockopt(m_serverSocket, ZMQ_ROUTING_ID, idBuffer, &intSize);
     if(status < 0)
         handleError(status);
+    #if LOG_LEVEL > 5
+        LOGGER << "Resolved id " << std::string((char*)idBuffer, ID_LENGTH) << std::endl;
+    #endif
 
     //####################################
-    unsigned char buffer[BUFFER_SIZE];
-    status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
-    if(status < 0)
-    {
-        handleError(status);
-        exit(1);
-    }
-    LOGGER << "EXTRA READ " << status << "\n" << std::string((char*)buffer, status);
-    status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
-    if(status < 0)
-    {
-        handleError(status);
-        exit(1);
-    }
-    LOGGER << "EXTRA READ " << status << "\n" << std::string((char*)buffer, status);
+    // unsigned char buffer[BUFFER_SIZE];
+    // status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
+    // if(status < 0)
+    // {
+    //     handleError(status);
+    //     exit(1);
+    // }
+    // LOGGER << "EXTRA READ " << status << "\n" << std::string((char*)buffer, status);
+    // status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
+    // if(status < 0)
+    // {
+    //     handleError(status);
+    //     exit(1);
+    // }
+    // LOGGER << "EXTRA READ " << status << "\n" << std::string((char*)buffer, status);
     //####################################
 
     return std::string((char*)idBuffer, ID_LENGTH);
