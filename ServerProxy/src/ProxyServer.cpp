@@ -291,8 +291,8 @@ std::string ProxyServer::connectToServer(std::string url)
     if(status < 0)
         return std::string();
     */
-    std::string address = std::string("tcp://") + url.substr(0, 9) + std::string(":8080");
-    zmq_connect(m_serverSocket, address);
+    address = std::string("tcp://") + url.substr(0, 9) + std::string(":8080");
+    zmq_connect(m_serverSocket, address.c_str());
     #if LOG_LEVEL > 5
         LOGGER << "Used server address " << address << std::endl;
     #endif
