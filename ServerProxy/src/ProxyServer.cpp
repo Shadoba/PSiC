@@ -283,7 +283,7 @@ std::string ProxyServer::connectToServer(std::string url)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = 0;
     hints.ai_flags = 0;
-    /*
+    ///*
     std::string extractedUrl = Utility::extractDomainName(url);
     #if LOG_LEVEL > 5
         LOGGER << "Extracted URL " << extractedUrl << std::endl;
@@ -307,7 +307,8 @@ std::string ProxyServer::connectToServer(std::string url)
     freeaddrinfo(result);
     if(status < 0)
         return std::string();
-    */
+    //*/
+    /*
     address = std::string("tcp://") + url.substr(7, 15);
     status = zmq_connect(m_serverSocket, address.c_str());
     #if LOG_LEVEL > 5
@@ -320,7 +321,7 @@ std::string ProxyServer::connectToServer(std::string url)
     status = zmq_getsockopt(m_serverSocket, ZMQ_ROUTING_ID, idBuffer, &intSize);
     if(status < 0)
         handleError(status);
-
+    */
     //####################################
     unsigned char buffer[BUFFER_SIZE];
     status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
