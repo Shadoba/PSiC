@@ -91,12 +91,7 @@ void ProxyServer::run()
         idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, 0);
         if(idStatus < 0)
         {
-            if(zmq_errno() == EAGAIN)
-                continue;
-            else
-            {
-                handleError(idStatus);
-            }
+            handleError(idStatus);
         }
         std::string idString = std::string((char*)id, ID_LENGTH);
         #if LOG_LEVEL > 5
@@ -269,7 +264,7 @@ void ProxyServer::run()
                         else
                         {
                             #if LOG_LEVEL > 5
-                                LOGGER << "Request method secure, sending to server" << std::endl;
+                                LOGGER << "Request method secure" << std::endl;
                             #endif
                             m_connections.push_back(new ProxyConnection(idString, serverId, true));
                         }
