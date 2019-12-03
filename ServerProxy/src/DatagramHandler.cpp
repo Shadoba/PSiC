@@ -33,8 +33,8 @@ DatagramHandler::DatagramHandler(const std::string & datagram) :
     m_Protocol = headerProcessor.getProtocolEnum();
     m_url = headerProcessor.Url;
 
-    if(httpRequest::CONNECT != m_RequestMethod)
-        int result = processDatagramBody(body);
+    //if(httpRequest::CONNECT != m_RequestMethod)
+        //int result = processDatagramBody(body);
 
     m_OutputDatagram = headerProcessor.OutputHeader;
     m_OutputDatagram += headerEnd;
@@ -102,7 +102,6 @@ int DatagramHandler::processDatagramBody(std::string & body)
         {
             /* 26 number characters are not reached --> keep trying      */
             numPosAbsolute += numPos + charCounter;
-            LOGGER << "TEST" << std::endl;
             bodyTmp = bodyTmp.substr(charCounter);
         }
     }
