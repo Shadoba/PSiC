@@ -15,12 +15,6 @@
 #define BUFFER_SIZE 8192
 #define ID_LENGTH 5
 
-
-//
-//SERVER SENDS AND RECEIVES ON THE SAME SOCKET, do zmq_connect(m_serverSocket) to send. A "connection", lasts for pretty much a single transfer, so clients will be reopening them constantly, be wary of those 0-frames
-//
-
-
 ProxyServer::ProxyServer(const std::string str)
 {
     m_context = zmq_ctx_new();
@@ -59,27 +53,6 @@ void ProxyServer::run()
         //########################################################################
         //Up to 100 connections at a time - check on creation if vector is at 100?
         //########################################################################
-        
-        //Respond with 413 if the request from client is too large - above 8192 bytes
-        //Close connections inactive for over 1 minute
-
-        //Recv NOBLOCK, skip the entire thing if no message available, increase an inactivity counter?
-        //Create DatagramHandler           //NEED TO CHECK IF THE MESSAGE IS A REQUEST OR RESPONSE!
-                                           //Based on where it came from? Then this has to be created later, after the connections check
-                                           //Based on the first line? Check if the third word is a number (status code). Can be done here.
-        //Discard and respond with error if invalid method/protocol
-        //If already in connections
-        //--No: (this means it's a request from the client)
-        //  resolve target IP
-        //  zmq_connect to target (if error respond to client with 502)
-        //  get ID frame
-        //  create ProxyConnection and add to vector
-        //  if appropriate, send data to server (do not send if it's CONNECT, just set up the ProxyConnection correctly)
-        //--Yes:
-        //  If the ProxyConnection is marked secure:
-        //  --No:
-        //    look into the request body and use that number algorithm we are required to implement
-        //  Send message to the other party
 
         unsigned char buffer[BUFFER_SIZE];
         int status;
