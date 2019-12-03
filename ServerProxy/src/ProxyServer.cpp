@@ -27,9 +27,9 @@ ProxyServer::ProxyServer(const std::string str)
     }
     
     //###############################################################
-    // int value = 0;
-    // size_t size = sizeof(value);
-    // zmq_setsockopt(m_serverSocket, ZMQ_STREAM_NOTIFY, &value, size);
+    int value = 0;
+    size_t size = sizeof(value);
+    zmq_setsockopt(m_serverSocket, ZMQ_STREAM_NOTIFY, &value, size);
     //###############################################################
 }
 
