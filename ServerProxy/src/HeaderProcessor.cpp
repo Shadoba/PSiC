@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <Config.hpp>
+
 HeaderProcessor::HeaderProcessor(std::string head) :
     InputHeader(m_head),
     Method(m_method),
@@ -23,6 +25,9 @@ std::map<std::string, std::string> HeaderProcessor::getFields() const
 
 void HeaderProcessor::pullDataFromHead(std::string head)
 {
+    #if LOG_LEVEL > 5
+        LOGGER << "Pulling data from header" << std::endl;
+    #endif
     std::vector<std::string> lines = Utility::splitString(head, "\r\n");
     std::vector<std::string> firstLineWords = Utility::splitString(lines.at(0), ' ');
     lines.erase(lines.begin());
@@ -45,6 +50,9 @@ void HeaderProcessor::pullDataFromHead(std::string head)
 //Na razie tylko przepisuje i podmienia URL, jeśli trzeba
 void HeaderProcessor::transformHead(std::string head)
 {
+    #if LOG_LEVEL > 5
+        LOGGER << "Transforming header" << std::endl;
+    #endif
     m_outputHeader += m_method + " ";
     m_outputHeader += m_uri + " ";
     m_outputHeader += m_protocol + "\r\n";
@@ -56,6 +64,9 @@ void HeaderProcessor::transformHead(std::string head)
 
 void HeaderProcessor::calculateUri()
 {
+    #if LOG_LEVEL > 5
+        LOGGER << "Calculating URI" << std::endl;
+    #endif
     size_t position = m_url.find('/');
     if(position != 0)                                       //Jeśli pierwszym znakiem nie jest '/', to mamy pełen URL
     {
