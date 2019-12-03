@@ -308,7 +308,7 @@ std::string ProxyServer::connectToServer(std::string url)
     if(status < 0)
         return std::string();
     */
-    address = std::string("tcp://") + url.substr(7, 14);
+    address = std::string("tcp://") + url.substr(7, 15);
     status = zmq_connect(m_serverSocket, address.c_str());
     #if LOG_LEVEL > 5
         LOGGER << "Used server address " << address << std::endl;
