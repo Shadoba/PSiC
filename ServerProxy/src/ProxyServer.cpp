@@ -282,7 +282,6 @@ void ProxyServer::run()
                 }
             }
         }
-
     }
 }
 

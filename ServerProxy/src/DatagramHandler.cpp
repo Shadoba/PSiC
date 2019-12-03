@@ -17,7 +17,7 @@ DatagramHandler::DatagramHandler(const std::string & datagram) :
     const char * const headerEnd = "\r\n\r\n";
     std::vector<std::string> splitDatagram = Utility::splitStringOnce(m_InputDatagram, headerEnd);
     #if LOG_LEVEL > 5
-    LOGGER << "Header split into: " << splitDatagram.size() << std::endl;
+        LOGGER << "Header split into: " << splitDatagram.size() << std::endl;
     #endif
     SERVER_ASSERT_MSG(2 != splitDatagram.size(), "splitStringOnce() more than one split")
 
@@ -102,6 +102,7 @@ int DatagramHandler::processDatagramBody(std::string & body)
         {
             /* 26 number characters are not reached --> keep trying      */
             numPosAbsolute += numPos + charCounter;
+            LOGGER << "TEST" << std::endl;
             bodyTmp = bodyTmp.substr(charCounter);
         }
     }
