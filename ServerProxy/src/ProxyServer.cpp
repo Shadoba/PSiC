@@ -154,11 +154,8 @@ void ProxyServer::run()
                     handleError(status);
                 }
 
-                dataStream.put('\0');
-                std::string dataString = dataStream.str();
-
                 #if LOG_LEVEL > 5
-                    LOGGER << dataString << std::endl;
+                    LOGGER << dataStream.str() << std::endl;
                 #endif
 
                 if(dataString.empty())
@@ -176,14 +173,14 @@ void ProxyServer::run()
                     #if LOG_LEVEL > 5
                         LOGGER << "Connection secure" << std::endl;
                     #endif
-                    sendMessage(currentConnection->getServerId(), dataString);
+                    sendMessage(currentConnection->getServerId(), dataStream.str());
                 }
                 else
                 {
                     #if LOG_LEVEL > 5
                         LOGGER << "Connection insecure, modifying body" << std::endl;
                     #endif
-                    DatagramHandler datagramHandler = DatagramHandler(dataString);
+                    DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
                     sendMessage(currentConnection->getServerId(), datagramHandler.OutputDatagram);
                 }
 
@@ -311,7 +308,7 @@ std::string ProxyServer::connectToServer(std::string url)
     if(status < 0)
         return std::string();
     */
-    address = std::string("tcp://") + url.substr(7, 9) + std::string(":8080");
+    address = std::string("tcp://") + url.substr(7, 14);
     status = zmq_connect(m_serverSocket, address.c_str());
     #if LOG_LEVEL > 5
         LOGGER << "Used server address " << address << std::endl;
