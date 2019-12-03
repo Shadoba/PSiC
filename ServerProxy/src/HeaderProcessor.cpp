@@ -31,6 +31,9 @@ void HeaderProcessor::pullDataFromHead(std::string head)
     std::vector<std::string> lines = Utility::splitString(head, "\r\n");
     std::vector<std::string> firstLineWords = Utility::splitString(lines.at(0), ' ');
     lines.erase(lines.begin());
+    #if LOG_LEVEL > 5
+        LOGGER << "First line words size " << firstLineWords.size() << std::endl;
+    #endif
     m_method = firstLineWords.at(0);
     m_url = firstLineWords.at(1);
     m_protocol = firstLineWords.at(2);
