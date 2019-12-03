@@ -13,7 +13,7 @@
 int main()
 {
     Config::getInstance().init(std::cout);
-    ProxyServer server = ProxyServer(std::string("tcp://127.1.1.1:8080"));
+    ProxyServer server = ProxyServer(std::string("tcp://127.1.2.3:8080"));
     try
     {
         server.run();

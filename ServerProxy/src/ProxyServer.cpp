@@ -88,14 +88,14 @@ void ProxyServer::run()
         unsigned char id[ID_LENGTH];
         int idStatus;
 
-        idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, ZMQ_DONTWAIT);
+        idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, 0);
         if(idStatus < 0)
         {
             if(zmq_errno() == EAGAIN)
                 continue;
             else
             {
-                handleError(0);
+                handleError(idStatus);
             }
         }
         std::string idString = std::string((char*)id, ID_LENGTH);
@@ -239,7 +239,7 @@ void ProxyServer::run()
             }
             else
             {
-                dataStream.write((char*)buffer, BUFFER_SIZE);
+                dataStream.write((char*)buffer, status);
                 dataStream.put('\0');
                 DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
                 if(datagramHandler.Protocol == protocol::protocol::INVALID)
