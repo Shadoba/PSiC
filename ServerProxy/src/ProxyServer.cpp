@@ -316,12 +316,13 @@ std::string ProxyServer::connectToServer(std::string url)
     #endif
     if(status < 0)
         return std::string();
+    */
     unsigned char idBuffer[ID_LENGTH];
     size_t intSize = ID_LENGTH;
     status = zmq_getsockopt(m_serverSocket, ZMQ_ROUTING_ID, idBuffer, &intSize);
     if(status < 0)
         handleError(status);
-    */
+
     //####################################
     unsigned char buffer[BUFFER_SIZE];
     status = zmq_recv(m_serverSocket, buffer, BUFFER_SIZE, 0);
