@@ -210,6 +210,9 @@ void ProxyServer::run()
                 dataStream.write((char*)buffer, status);
                 dataStream.put('\0');
                 DatagramHandler datagramHandler = DatagramHandler(dataStream.str());
+                #if LOG_LEVEL > 5
+                    LOGGER << datagramHandler.OutputDatagram << std::endl;
+                #endif
                 if(datagramHandler.Protocol == protocol::protocol::INVALID)
                 {
                     respondWith501(idString);
