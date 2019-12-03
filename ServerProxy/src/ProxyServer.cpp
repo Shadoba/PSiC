@@ -235,7 +235,7 @@ void ProxyServer::run()
                                 LOGGER << "Request method insecure, sending to server" << std::endl;
                             #endif
                             m_connections.push_back(new ProxyConnection(idString, serverId, false));
-                            sendMessage(serverId, dataStream.str());
+                            sendMessage(serverId, datagramHandler.OutputDatagram);
                         }
                         else
                         {
