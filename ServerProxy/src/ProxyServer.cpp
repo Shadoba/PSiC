@@ -200,8 +200,7 @@ void ProxyServer::run()
                 LOGGER << std::string((char*)buffer, status) << std::endl;
                 exit(1);
             }
-            //Handle what if this isn't empty??
-            idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, 0);                              //Create a method bundling receive and error handling?
+            idStatus = zmq_recv(m_serverSocket, id, ID_LENGTH, 0);
             if(idStatus < 0)
             {
                 handleError(idStatus);
@@ -328,6 +327,7 @@ void ProxyServer::sendMessage(std::string id, std::string message)
 {
     #if LOG_LEVEL > 5
         LOGGER << "Sending message to " << id << std::endl;
+        LOGGER << message << std::endl;
     #endif
     int status;
     status = zmq_send(m_serverSocket, id.c_str(), id.size(), ZMQ_SNDMORE);
