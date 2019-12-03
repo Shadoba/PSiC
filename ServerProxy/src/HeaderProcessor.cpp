@@ -33,6 +33,10 @@ void HeaderProcessor::pullDataFromHead(std::string head)
     lines.erase(lines.begin());
     #if LOG_LEVEL > 5
         LOGGER << "First line words size " << firstLineWords.size() << std::endl;
+        if(firstLineWords.size() != 3)
+        {
+            LOGGER << head << std::endl;
+        }
     #endif
     m_method = firstLineWords.at(0);
     m_url = firstLineWords.at(1);
