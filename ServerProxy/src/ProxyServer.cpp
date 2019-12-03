@@ -266,6 +266,7 @@ std::string ProxyServer::connectToServer(std::string url)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = 0;
     hints.ai_flags = 0;
+    if(url)
     /*
     std::string extractedUrl = Utility::extractDomainName(url);
     #if LOG_LEVEL > 5
@@ -291,11 +292,13 @@ std::string ProxyServer::connectToServer(std::string url)
     if(status < 0)
         return std::string();
     */
-    address = std::string("tcp://") + url.substr(0, 9) + std::string(":8080");
-    zmq_connect(m_serverSocket, address.c_str());
+    address = std::string("tcp://") + url.substr(7, 9) + std::string(":8080");
+    status = zmq_connect(m_serverSocket, address.c_str());
     #if LOG_LEVEL > 5
         LOGGER << "Used server address " << address << std::endl;
     #endif
+    if(status < 0)
+        return std::string();
     unsigned char idBuffer[ID_LENGTH];
     size_t intSize = ID_LENGTH;
     status = zmq_getsockopt(m_serverSocket, ZMQ_ROUTING_ID, idBuffer, &intSize);
