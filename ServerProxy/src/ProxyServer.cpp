@@ -158,7 +158,7 @@ void ProxyServer::run()
                     LOGGER << dataStream.str() << std::endl;
                 #endif
 
-                if(dataString.empty())
+                if(dataStream.str().empty())
                 {
                     #if LOG_LEVEL > 5
                         LOGGER << "Closed connection from " << idString << std::endl;
